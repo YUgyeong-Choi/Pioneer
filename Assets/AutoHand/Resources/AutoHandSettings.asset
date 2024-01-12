@@ -15,4 +15,4 @@ MonoBehaviour:
   ignoreSetup: 0
   usingDynamicTimestep: 0
   useAutomaticControllerOffset: 1
-  quality: 2
+  quality: 3

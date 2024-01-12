@@ -224,7 +224,8 @@ namespace Autohand {
                 grabbableParents.Remove(this);
         }
 
-        private void OnDisable() {
+        protected override void OnDisable() {
+            base.OnDisable();
             if(heldBy.Count != 0)
                 ForceHandsRelease();
         }

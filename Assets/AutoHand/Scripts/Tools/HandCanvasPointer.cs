@@ -67,7 +67,7 @@ namespace Autohand
                     cam.transform.parent = AutoHandExtensions.transformParent;
 
 #if (UNITY_2020_3_OR_NEWER)
-                    var canvases = FindObjectsOfType<Canvas>(true);
+                    var canvases = AutoHandExtensions.CanFindObjectsOfType<Canvas>(true);
 #else
                     var canvases = FindObjectsOfType<Canvas>();
 #endif
@@ -156,9 +156,9 @@ namespace Autohand
                 {
                     inputModule = inputMod;
                 }
-                else if (!(inputModule = FindObjectOfType<AutoInputModule>()))
+                else if (!(inputModule = AutoHandExtensions.CanFindObjectOfType<AutoInputModule>()))
                 {
-                    EventSystem system = FindObjectOfType<EventSystem>();
+                    EventSystem system = AutoHandExtensions.CanFindObjectOfType<EventSystem>();
                     if(system == null) {
                         system = new GameObject().AddComponent<EventSystem>();
                         system.name = "UI Input Event System";

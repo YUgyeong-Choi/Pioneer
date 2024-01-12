@@ -323,11 +323,8 @@ namespace Autohand {
                 palmChild.parent = palmTransform;
             }
 
-#if (UNITY_2020_3_OR_NEWER)
-            var cams = FindObjectsOfType<Camera>(true);
-#else
-            var cams = FindObjectsOfType<Camera>();
-#endif
+            var cams = AutoHandExtensions.CanFindObjectsOfType<Camera>(true);
+
             foreach(var cam in cams) {
                 if(cam.targetDisplay == 0) {
                     bool found = false;
@@ -346,7 +343,7 @@ namespace Autohand {
 
             usingDynamicTimestep = AutoHandSettings.UsingDynamicTimestep();
             if(usingDynamicTimestep) {
-                if(FindObjectOfType<DynamicTimestepSetter>() == null) {
+                if(AutoHandExtensions.CanFindObjectOfType<DynamicTimestepSetter>() == null) {
                     new GameObject() { name = "DynamicFixedTimeSetter" }.AddComponent<DynamicTimestepSetter>();
                     Debug.Log("AUTO HAND: Creating Dynamic Timestepper");
                 }

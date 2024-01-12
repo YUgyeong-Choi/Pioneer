@@ -52,12 +52,12 @@ namespace Autohand{
         }
 
         private void Start() {
-            playerBody = FindObjectOfType<AutoHandPlayer>();
+            playerBody = AutoHandExtensions.CanFindObjectOfType<AutoHandPlayer>();
             if (playerBody != null && playerBody.transform.gameObject == teleportObject)
                 teleportObject = null;
 
             lineArr = new Vector3[lineSegments];
-            teleportGuards = FindObjectsOfType<HandTeleportGuard>();
+            teleportGuards = AutoHandExtensions.CanFindObjectsOfType<HandTeleportGuard>();
         }
 
         void Update(){

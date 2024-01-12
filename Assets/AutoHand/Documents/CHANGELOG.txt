@@ -1,3 +1,10 @@
+V3.2.5
+Bug Fixes
+- Fixed bug with demo scene not working properly
+- Removed deprecated code warnings for Unity 2023 versions
+- Disabled Automatic Controller Offsetter by default, new controller offsetter coming soon
+
+
 V3.2.4
 Improvements
 - Improvements to grab behavior smoothness

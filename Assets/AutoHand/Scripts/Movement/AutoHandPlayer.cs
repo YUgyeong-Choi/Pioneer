@@ -27,7 +27,7 @@ namespace Autohand {
         public static AutoHandPlayer Instance {
             get {
                 if(_Instance == null && !notFound)
-                    _Instance = FindObjectOfType<AutoHandPlayer>();
+                    _Instance = AutoHandExtensions.CanFindObjectOfType<AutoHandPlayer>();
 
                 if(_Instance == null)
                     notFound = true;
@@ -375,9 +375,9 @@ namespace Autohand {
                 if(headPhysicsFollower != null)
                     grab?.IgnoreColliders(headPhysicsFollower.headCollider, false);
 
-                if(grab && grab.parentOnGrab && grab.body != null)
+                if(grab && grab.parentOnGrab && grab.body != null && !grab.body.isKinematic)
                     grab.body.velocity += body.velocity / 2f;
-            }
+            } 
         }
 
         public void IgnoreCollider(Collider col, bool ignore) {

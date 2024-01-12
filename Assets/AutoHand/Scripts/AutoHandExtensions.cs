@@ -201,6 +201,27 @@ namespace Autohand
 #endif
         }
 
+        /// <summary>Autohand extension method, used so I can use TryGetComponent for newer versions and GetComponent for older versions</summary>
+        public static T CanFindObjectOfType<T>(bool includeInactive = false) where T : Component {
+#if UNITY_2023_1_OR_NEWER
+            return GameObject.FindFirstObjectByType<T>((includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude));
+#elif (UNITY_2020_3_OR_NEWER)
+            return GameObject.FindObjectOfType<T>(includeInactive);
+#else
+            return GameObject.FindObjectOfType<T>();
+#endif
+        }
+        /// <summary>Autohand extension method, used so I can use TryGetComponent for newer versions and GetComponent for older versions</summary>
+        public static T[] CanFindObjectsOfType<T>(bool includeInactive = false) where T : Component {
+#if UNITY_2023
+            return GameObject.FindObjectsByType<T>((includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude), FindObjectsSortMode.None);
+#elif (UNITY_2020_3_OR_NEWER)
+            return GameObject.FindObjectsOfType<T>(includeInactive);
+#else
+            return GameObject.FindObjectsOfType<T>();
+#endif
+        }
+
 
 
 
