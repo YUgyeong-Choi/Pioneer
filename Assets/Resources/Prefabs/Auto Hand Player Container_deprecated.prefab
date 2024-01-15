@@ -2150,7 +2150,7 @@ GameObject:
   - component: {fileID: 4365141487874949991}
   - component: {fileID: 2560973047405361250}
   m_Layer: 0
-  m_Name: Auto Hand Player Container
+  m_Name: Auto Hand Player Container_deprecated
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
