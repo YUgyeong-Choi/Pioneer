@@ -6,9 +6,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
     // 싱글톤 인스턴스
     public static NetworkManager instance = null;
-
-    // VR 플레이어의 시작 지점
-    public Transform XROrigin;
+    public Transform centerEyeAnchor;
+    public GameObject playerPrefab;
 
     // 플레이어가 생성될 위치의 배열
     [SerializeField] private Transform[] m_SpawnPoints;
@@ -76,20 +75,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         // Vector3 pos = m_SpawnPoints[PhotonNetwork.CurrentRoom.PlayerCount - 1].position;
         // Quaternion rot = m_SpawnPoints[PhotonNetwork.CurrentRoom.PlayerCount - 1].rotation;
 
-        Vector3 pos = Vector3.zero;
-        Quaternion rot = Quaternion.identity;
+        spawnPlayer();
+    }
 
-        // PhotonNetwork를 사용해 VRPlayer 프리팹 인스턴스화
-        m_Player = PhotonNetwork.Instantiate("VRPlayer", pos, rot, 0);
-        if (m_Player.GetComponent<PhotonView>().IsMine)
+    public void spawnPlayer()
+    {
+        GameObject playerInstance = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity);
+        if (playerInstance.GetComponent<PhotonView>().IsMine)
         {
-            GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-            camera.transform.SetParent(m_Player.transform, false);
+            SyncPosition syncScript = playerInstance.GetComponent<SyncPosition>();
+            if (syncScript != null)
+            {
+                syncScript.target = centerEyeAnchor;
+            }
         }
-
-        // XROrigin의 위치와 회전을 설정된 스폰 포인트로 초기화
-        XROrigin.transform.position = pos;
-        XROrigin.transform.rotation = rot;
     }
 
     public override void OnLeftRoom()
