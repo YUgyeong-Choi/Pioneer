@@ -287,7 +287,7 @@ namespace Autohand {
 
                 var col = headFollower.gameObject.AddComponent<SphereCollider>();
                 col.material = bodyCapsule.material;
-                col.radius = bodyCapsule.radius;
+                col.radius = headRadius;
 
                 var headBody = headFollower.gameObject.AddComponent<Rigidbody>();
                 headBody.drag = 5;

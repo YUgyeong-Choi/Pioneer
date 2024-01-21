@@ -5865,7 +5865,7 @@ GameObject:
   - component: {fileID: 2013966662767713498}
   - component: {fileID: 700805065423375474}
   - component: {fileID: 8559739562774779528}
-  - component: {fileID: 4631428452861668627}
+  - component: {fileID: 7412970900695241149}
   m_Layer: 0
   m_Name: CenterEyeAnchor
   m_TagString: MainCamera
@@ -5963,7 +5963,7 @@ MonoBehaviour:
   fadeColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
   fadeOnStart: 1
   renderQueue: 5000
---- !u!114 &4631428452861668627
+--- !u!114 &7412970900695241149
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -16682,6 +16682,10 @@ PrefabInstance:
       propertyPath: headCamera
       value: 
       objectReference: {fileID: 700805065423375474}
+    - target: {fileID: 8834320319295017360, guid: fdc3ba53f4e81a040b0471bbbafbb10a, type: 3}
+      propertyPath: headRadius
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 8834320319295017360, guid: fdc3ba53f4e81a040b0471bbbafbb10a, type: 3}
       propertyPath: maxStepAngle
       value: 60
