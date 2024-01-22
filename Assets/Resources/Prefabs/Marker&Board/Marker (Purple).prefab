@@ -241,8 +241,7 @@ GameObject:
   - component: {fileID: 6861888887087479032}
   - component: {fileID: 6938390132290617512}
   - component: {fileID: 7055249822353520616}
-  - component: {fileID: 8581257819799280015}
-  - component: {fileID: 2354682627458767637}
+  - component: {fileID: 3567674084950931599}
   - component: {fileID: 82605717569218940}
   m_Layer: 0
   m_Name: Marker (Purple)
@@ -553,72 +552,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8581257819799280015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6595559421533328762}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoreMe: 0
-  body: {fileID: 0}
-  hightlightMaterial: {fileID: 0}
-  isGrabbable: 1
-  CopySettings: {fileID: 0}
-  grabType: 0
-  handType: 0
-  singleHandOnly: 0
-  instantGrab: 0
-  useGentleGrab: 0
-  maintainGrabOffset: 0
-  parentOnGrab: 1
-  heldNoFriction: 1
-  ignoreWeight: 0
-  allowHeldSwapping: 1
-  throwPower: 1
-  jointBreakForce: 3500
-  showAdvancedSettings: 1
-  makeChildrenGrabbable: 1
-  grabPriorityWeight: 1
-  ignoreReleaseTime: 0.5
-  minHeldDrag: 1.5
-  minHeldAngleDrag: 3
-  maxHeldVelocity: 10
-  heldPositionOffset: {x: 0, y: 0, z: 0}
-  heldRotationOffset: {x: 0, y: 0, z: 0}
-  customGrabJoint: {fileID: 0}
-  jointedBodies: []
-  heldIgnoreColliders: []
-  pullApartBreakOnly: 1
-  showEvents: 1
-  onGrab:
-    m_PersistentCalls:
-      m_Calls: []
-  onRelease:
-    m_PersistentCalls:
-      m_Calls: []
-  onSqueeze:
-    m_PersistentCalls:
-      m_Calls: []
-  onUnsqueeze:
-    m_PersistentCalls:
-      m_Calls: []
-  onHighlight:
-    m_PersistentCalls:
-      m_Calls: []
-  onUnhighlight:
-    m_PersistentCalls:
-      m_Calls: []
-  OnJointBreak:
-    m_PersistentCalls:
-      m_Calls: []
-  lockHandOnGrab: 0
---- !u!114 &2354682627458767637
+--- !u!114 &3567674084950931599
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -690,9 +624,9 @@ MonoBehaviour:
     - {x: -0.000008029863, y: 0.0000010747461, z: -0.0000007860363, w: 1}
   rightPoseSet: 1
   leftPose:
-    handOffset: {x: -0.014900213, y: -0.060299993, z: -0.07750019}
+    handOffset: {x: 0.014899977, y: 0.060299993, z: -0.07750034}
     rotationOffset: {x: 0, y: 0, z: 0}
-    localQuaternionOffset: {x: -0.18295844, y: -0.61011267, z: 0.22143319, w: 0.7384146}
+    localQuaternionOffset: {x: 0.61011267, y: -0.18295841, z: 0.73841465, w: -0.2214332}
     posePositions:
     - {x: -0.02376944, y: -0.031376585, z: -0.011237786}
     - {x: -0.0420796, y: 0.00000004053116, z: -0.0000000667572}
@@ -721,14 +655,14 @@ MonoBehaviour:
     - {x: -0.0000061402106, y: -0.0000049649398, z: 0.0000024675394, w: 1}
     - {x: 0.09237096, y: -0.5504681, z: 0.044839315, w: 0.828518}
     - {x: 0.003786935, y: -0.22944441, z: -0.006034916, w: 0.9732957}
-    - {x: -0.0014759946, y: -0.31090847, z: 0.002927222, w: 0.95043415}
+    - {x: -0.0014759947, y: -0.3109085, z: 0.0029272223, w: 0.9504342}
     - {x: -0.0000034403058, y: -0.000003005378, z: -0.000007307157, w: 1}
     - {x: 0.004241388, y: -0.47170395, z: -0.0007504979, w: 0.8817465}
     - {x: 0.008474435, y: -0.60626966, z: 0.009029791, w: 0.79516274}
     - {x: 0.0049752668, y: -0.45956108, z: 0.0052264496, w: 0.8881169}
     - {x: -0.0000072037797, y: -0.0000022402965, z: -0.0000032116654, w: 1}
-    - {x: -0.085351534, y: -0.66045374, z: -0.04609368, w: 0.7445746}
-    - {x: 0.027625708, y: -0.699027, z: 0.025130456, w: 0.7141194}
+    - {x: -0.08535154, y: -0.66045374, z: -0.046093684, w: 0.7445746}
+    - {x: 0.02762571, y: -0.699027, z: 0.025130458, w: 0.7141194}
     - {x: 0.03158009, y: -0.53494, z: -0.016046247, w: 0.8441472}
     - {x: -0.0000075772396, y: 0.0000004423782, z: -0.000001301989, w: 1}
     - {x: -0.16609184, y: -0.659473, z: -0.006502539, w: 0.73312116}
