@@ -318,10 +318,10 @@ MonoBehaviour:
   CopySettings: {fileID: 0}
   grabType: 0
   handType: 0
-  singleHandOnly: 0
-  instantGrab: 0
+  singleHandOnly: 1
+  instantGrab: 1
   useGentleGrab: 0
-  maintainGrabOffset: 0
+  maintainGrabOffset: 1
   parentOnGrab: 1
   heldNoFriction: 1
   ignoreWeight: 0
