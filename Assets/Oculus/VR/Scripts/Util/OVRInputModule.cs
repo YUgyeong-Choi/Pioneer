@@ -943,5 +943,11 @@ namespace UnityEngine.EventSystems
 
             return scrollDelta;
         }
+        
+        protected override void ProcessMove(PointerEventData pointerEvent)
+        {
+            var targetGO = pointerEvent.pointerCurrentRaycast.gameObject;
+            HandlePointerExitAndEnter(pointerEvent, targetGO);
+        }
     };
 }
