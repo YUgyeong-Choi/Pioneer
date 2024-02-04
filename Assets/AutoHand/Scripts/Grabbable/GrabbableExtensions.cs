@@ -27,6 +27,17 @@ namespace Autohand {
             if(removeBody)
                 GameObject.Destroy(from);
         }
+        public SaveRigidbodyData(SaveRigidbodyData from) {
+            origin = from.origin;
+            mass = from.mass;
+            drag = from.drag;
+            angularDrag = from.angularDrag;
+            useGravity = from.useGravity;
+            isKinematic = from.isKinematic;
+            interpolation = from.interpolation;
+            collisionDetectionMode = from.collisionDetectionMode;
+            constraints = from.constraints;
+        }
 
         public Transform GetOrigin() {
             return origin.transform;

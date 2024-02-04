@@ -13,6 +13,7 @@ public class AutoHandSettings : ScriptableObject{
     public static void ClearSettings() {
         var _handSettings = Resources.Load<AutoHandSettings>("AutoHandSettings");
         _handSettings.ignoreSetup = false;
+        _handSettings.usingDynamicTimestep = true;
         _handSettings.quality = -1;
 #if UNITY_EDITOR
         UnityEditor.EditorUtility.SetDirty(_handSettings);

@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 namespace Autohand {
 
     [DefaultExecutionOrder(-100)]
-    public class GrabbableBase : MonoBehaviour{
+    public class GrabbableBase : MonoBehaviour {
 
         [AutoHeader("Grabbable")]
         public bool ignoreMe;
@@ -28,13 +28,29 @@ namespace Autohand {
         private PlacePoint _placePoint = null;
         public PlacePoint placePoint { get { return _placePoint; } protected set { _placePoint = value; } }
 
+
         internal List<Collider> _grabColliders = new List<Collider>();
         public List<Collider> grabColliders { get { return _grabColliders; } }
+
+
+        protected List<PlacePoint> _childPlacePoints = new List<PlacePoint>();
+        public List<PlacePoint> childPlacePoints { get { return _childPlacePoints; } }
+
+        internal Grabbable rootGrabbable;
+        internal List<Grabbable> grabbableChildren = new List<Grabbable>();
+        internal List<Grabbable> grabbableParents = new List<Grabbable>();
+        internal List<Grabbable> jointedGrabbables = new List<Grabbable>();
+        internal List<GrabbableChild> grabChildren = new List<GrabbableChild>();
+
+        internal float preheldDrag;
+        internal float preheldAngularDrag;
+
         protected Dictionary<Collider, PhysicMaterial> grabColliderMaterials = new Dictionary<Collider, PhysicMaterial>();
         protected Dictionary<Transform, int> originalLayers = new Dictionary<Transform, int>();
 
         protected List<Hand> heldBy = new List<Hand>();
         protected List<Hand> beingGrabbedBy = new List<Hand>();
+        protected List<Hand> waitingToGrabHands = new List<Hand>();
         protected bool hightlighting;
         protected GameObject highlightObj;
         protected PlacePoint lastPlacePoint = null;
@@ -47,23 +63,15 @@ namespace Autohand {
 
         protected internal bool beingGrabbed = false;
         protected internal bool beforeGrabFrame = false;
-        //protected bool heldBodyJointed = false;
         protected bool wasIsGrabbable = false;
         protected bool beingDestroyed = false;
         protected Dictionary<Hand, Coroutine> resetLayerRoutine = new Dictionary<Hand, Coroutine>();
         protected Dictionary<Hand, Coroutine> ignoreWhileGrabbingRoutine = new Dictionary<Hand, Coroutine>();
-        internal List<Grabbable> jointedGrabbables = new List<Grabbable>();
-        internal List<GrabbableChild> grabChildren = new List<GrabbableChild>();
-        internal List<Grabbable> grabbableChildren = new List<Grabbable>();
-        internal List<Grabbable> grabbableParents = new List<Grabbable>();
         protected List<Transform> jointedParents = new List<Transform>();
         protected Dictionary<Material, List<GameObject>> highlightObjs = new Dictionary<Material, List<GameObject>>();
 
         protected GrabbablePoseCombiner poseCombiner;
         protected float lastUpdateTime;
-
-        internal float preheldDrag;
-        internal float preheldAngularDrag;
 
         protected bool rigidbodyDeactivated = false;
         protected SaveRigidbodyData rigidbodyData;
@@ -181,21 +189,26 @@ namespace Autohand {
             resetLayerRoutine.Clear();
 
             foreach(var routine in ignoreGrabbableCollisions) {
-                StopCoroutine(routine.Value);
+                if(routine.Value != null)
+                    StopCoroutine(routine.Value);
             }
             ignoreGrabbableCollisions.Clear();
 
             foreach(var routine in ignoreHandCollisions) {
-                StopCoroutine(routine.Value);
+                if(routine.Value != null)
+                    StopCoroutine(routine.Value);
             }
             ignoreHandCollisions.Clear();
 
         }
         
 
-        
         internal void SetPlacePoint(PlacePoint point) {
             this.placePoint = point;
+
+            foreach(var grabbable in grabbableChildren) {
+                grabbable.placePoint = point;
+            }
         }
 
         internal void SetGrabbableChild(GrabbableChild child) {
@@ -210,16 +223,32 @@ namespace Autohand {
             if (body != null){
                 if(body != null)
                     rigidbodyData = new SaveRigidbodyData(body);
+
                 body = null;
                 rigidbodyDeactivated = true;
             }
+
+            foreach(var grabbable in grabbableChildren) {
+                if(grabbable.body != null) {
+                    grabbable.body = null;
+                    grabbable.rigidbodyData = new SaveRigidbodyData(rigidbodyData);
+                    grabbable.rigidbodyDeactivated = true;
+                }
+            }
         }
+
 
         public void ActivateRigidbody()
         {
-            if (rigidbodyDeactivated){
+            if (rigidbodyDeactivated && !beingDestroyed){
                 rigidbodyDeactivated = false;
                 body = rigidbodyData.ReloadRigidbody();
+
+                foreach(var grabbable in grabbableChildren) {
+                    grabbable.rigidbodyDeactivated = false;
+                    if(grabbable.body == null)
+                        grabbable.body = body;
+                }
             }
         }
 
@@ -241,7 +270,8 @@ namespace Autohand {
 
         Dictionary<Grabbable, Coroutine> ignoreGrabbableCollisions = new Dictionary<Grabbable, Coroutine>();
         public void IgnoreGrabbableCollisionUntilNone(Grabbable other) {
-            ignoreGrabbableCollisions.Add(other, StartCoroutine(IgnoreGrabbableCollisionUntilNoneRoutine(other)));
+            if(!beingDestroyed && !ignoreGrabbableCollisions.ContainsKey(other))
+                ignoreGrabbableCollisions.Add(other, StartCoroutine(IgnoreGrabbableCollisionUntilNoneRoutine(other)));
         }
 
         protected IEnumerator IgnoreGrabbableCollisionUntilNoneRoutine(Grabbable other) {
@@ -285,7 +315,7 @@ namespace Autohand {
 
         Dictionary<Hand, Coroutine> ignoreHandCollisions = new Dictionary<Hand, Coroutine>();
         public void IgnoreHandCollisionUntilNone(Hand hand, float minIgnoreTime = 1) {
-            if(gameObject.activeInHierarchy && !beingDestroyed)
+            if(gameObject.activeInHierarchy && !beingDestroyed && !ignoreHandCollisions.ContainsKey(hand))
                 ignoreHandCollisions.Add(hand, StartCoroutine(IgnoreHandCollisionUntilNoneRoutine(hand, minIgnoreTime)));
         }
 
@@ -399,13 +429,18 @@ namespace Autohand {
 
         public void SetCollidersRecursive(Transform obj) {
 
-            var noFrictionMat = Resources.Load<PhysicMaterial>("NoFriction");
             foreach(var col in obj.GetComponents<Collider>()) {
-                grabColliders.Add(col);
-                if(col.sharedMaterial == null || col.sharedMaterial == noFrictionMat)
+                if(col.isTrigger)
+                    continue;
+
+                if(!grabColliders.Contains(col))
+                    grabColliders.Add(col);
+
+                if(col.sharedMaterial == null)
                     grabColliderMaterials.Add(col, null);
                 else
                     grabColliderMaterials.Add(col, col.sharedMaterial);
+
                 if(!originalLayers.ContainsKey(col.transform)) {
                     if(col.gameObject.layer == LayerMask.NameToLayer("Default") || LayerMask.LayerToName(col.gameObject.layer) == "")
                         col.gameObject.layer = LayerMask.NameToLayer(Hand.grabbableLayerNameDefault);
@@ -416,15 +451,32 @@ namespace Autohand {
             for (int i = 0; i < obj.childCount; i++)
                 SetCollidersRecursive(obj.GetChild(i));
         }
-        
-        //Resets to original collision dection
-        protected void ResetRigidbody() {
-            if (body != null)
-            {
-                body.collisionDetectionMode = detectionMode;
-                body.interpolation = startInterpolation;
+
+        /// <summary>Adds a grabbables collider to this list of colliders on this grabbable</summary>
+        public void AddGrabbableColliders(Grabbable other) {
+            var ignoreHandKeys = new List<Hand>(ignoreHandCollisions.Keys);
+            foreach(var col in other.grabColliders) {
+                if(!grabColliders.Contains(col)) {
+                    grabColliders.Add(col);
+                    for(int i = 0; i < ignoreHandKeys.Count; i++)
+                        ignoreHandKeys[i].HandIgnoreCollider(col, true);
+                }
             }
         }
+
+        public void RemoveGrabbableColliders(Grabbable other) {
+            var ignoreHandKeys = new List<Hand>(ignoreHandCollisions.Keys);
+            foreach(var col in other.grabColliders) {
+                if(grabColliders.Contains(col)) {
+                    grabColliders.Remove(col);
+                    for(int i = 0; i < ignoreHandKeys.Count; i++)
+                        ignoreHandKeys[i].HandIgnoreCollider(col, false);
+                }
+            }
+        }
+
+
+        
 
         public bool BeingDestroyed() {
             return beingDestroyed;

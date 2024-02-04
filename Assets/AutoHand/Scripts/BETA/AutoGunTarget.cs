@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Autohand {
-    [RequireComponent(typeof(Rigidbody))]
     public class AutoGunTarget : MonoBehaviour {
         public GameObject hitDecal;
         public ParticleSystem hitParticle;

@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace Autohand{
-    [RequireComponent(typeof(Rigidbody))]
     public class Sticky : MonoBehaviour{
         [Header("Sticky Settings")]
+        public Rigidbody body;
         [Tooltip("How strong the joint is between the stickable and this")]
         public float stickStrength = 1;
         [Tooltip("Multiplyer for required stick speed to activate")]
@@ -17,7 +17,6 @@ namespace Autohand{
         [Header("Event")]
         public UnityEvent OnStick;
 
-        Rigidbody body;
         List<Stickable> stickers;
         List<Joint> joints;
 

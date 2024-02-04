@@ -145,6 +145,7 @@ namespace Autohand
                         Mathf.Clamp(transform.localPosition.z, localStartOrigin.z + zMinLimit, localStartOrigin.z + zMaxLimit)
                     );
                     jointHand.heldJoint.connectedAnchor += (localTargetPosition - localPosition);
+                    jointHand.handGrabPoint.localPosition += (localTargetPosition - localPosition);
                 }
             }
             else

@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine.Serialization;
+using UnityEngine.XR;
 
 
 namespace Autohand {
@@ -17,7 +18,7 @@ namespace Autohand {
     }
 
     [HelpURL("https://app.gitbook.com/s/5zKO0EvOjzUDeT2aiFk3/auto-hand/grabbable"), DefaultExecutionOrder(-100)]
-    public class Grabbable : GrabbableBase {
+    public class Grabbable : GrabbableBase, IGrabbableEvents {
 
 
         [Tooltip("This will copy the given grabbables settings to this grabbable when applied"), OnValueChanged("EditorCopyGrabbable")]
@@ -196,7 +197,7 @@ namespace Autohand {
 #endif
         }
 
-        public new virtual void Awake() {
+        public override void Awake() {
             base.Awake();
 
             if(makeChildrenGrabbable)
@@ -207,12 +208,31 @@ namespace Autohand {
                 grabChild.grabParent = this;
             }
 
+
             for(int i = 0; i < jointedBodies.Count; i++) {
                 jointedParents.Add(jointedBodies[i].transform.parent != null ? jointedBodies[i].transform.parent : null);
                 if(jointedBodies[i].gameObject.HasGrabbable(out var grabbable) && !jointedGrabbables.Contains(grabbable))
                     jointedGrabbables.Add(grabbable);
             }
 
+            for(int i = 0; i < transform.childCount; i++) {
+                ConnectGrabbablesRecursive(transform.GetChild(i));
+            }
+
+            void ConnectGrabbablesRecursive(Transform obj) {
+                Grabbable grab1;
+                for(int i = 0; i < obj.childCount; i++) {
+                    if(obj.CanGetComponent<Grabbable>(out grab1)) {
+                        if(!grabbableChildren.Contains(grab1))
+                            grabbableChildren.Add(grab1);
+
+                        if(!grab1.grabbableParents.Contains(this))
+                            grab1.grabbableParents.Add(this);
+                    }
+
+                    ConnectGrabbablesRecursive(obj.GetChild(i));
+                }
+            }
 
             grabbableChildren = new List<Grabbable>(GetComponentsInChildren<Grabbable>(true));
             if(grabbableChildren.Contains(this))
@@ -222,6 +242,39 @@ namespace Autohand {
             grabbableParents = new List<Grabbable>(GetComponentsInParent<Grabbable>(true));
             if(grabbableParents.Contains(this))
                 grabbableParents.Remove(this);
+
+
+            //This will automatically prevent grabbables from being placed into any place points that are children of this grabbable
+            var placePointChildren = GetComponentsInChildren<PlacePoint>(true);
+            for(int i = 0; i < placePointChildren.Length; i++) {
+
+                if(placePointChildren[i].dontAllows == null)
+                    placePointChildren[i].dontAllows = new List<Grabbable>();
+                placePointChildren[i].dontAllows.Add(this);
+
+                if(!childPlacePoints.Contains(placePointChildren[i]))
+                    childPlacePoints.Add(placePointChildren[i]);
+
+                if(grabbableParents.Count == 0)
+                    placePointChildren[i].parentGrabbable = this;
+
+                foreach(var grabbable in grabbableChildren) {
+                    if(grabbable != this && !placePointChildren[i].dontAllows.Contains(grabbable))
+                        placePointChildren[i].dontAllows.Add(grabbable);
+                }
+
+                foreach(var grabbable in grabbableParents) {
+                    if(grabbable != this && !placePointChildren[i].dontAllows.Contains(grabbable))
+                        placePointChildren[i].dontAllows.Add(grabbable);
+                }
+            }
+
+            if(grabbableParents.Count == 0) {
+                foreach(var grabbable in grabbableChildren) {
+                    grabbable.rootGrabbable = this;
+                }
+                rootGrabbable = this;
+            }
         }
 
         protected override void OnDisable() {
@@ -241,11 +294,9 @@ namespace Autohand {
                 if(routine.Value != null)
                     StopCoroutine(routine.Value);
 
-                
                 IgnoreHand(routine.Key, false);
             }
             resetLayerRoutine.Clear();
-
 
             MakeChildrenUngrabbable();
             if (placePoint != null && !placePoint.disablePlacePointOnPlace)
@@ -261,13 +312,13 @@ namespace Autohand {
                 ForceHandsRelease();
 
 
-            moveTos.Clear();
+            rootGrabbable.moveTos.Clear();
             var heldBy = GetHeldBy(true, true);
             if(heldBy.Count > 1) {
                 for(int i = 0; i < heldBy.Count; i++)
                     heldBy[i].SetMoveTo(true);
                 for(int i = 0; i < heldBy.Count; i++)
-                    moveTos.Add(heldBy[i], heldBy[i].moveTo.position - heldBy[i].transform.position);
+                    rootGrabbable.moveTos.Add(heldBy[i], heldBy[i].moveTo.position - heldBy[i].transform.position);
             }
 
             wasIsGrabbable = isGrabbable || enabled;
@@ -405,6 +456,10 @@ namespace Autohand {
             StartIgnoreRoutine(hand, false);
         }
 
+        public bool IsOnlyBeingGrabbedBy(Hand hand) {
+            return beingGrabbedBy.Contains(hand) && beingGrabbedBy.Count == 1;
+        }
+
 
         void StartIgnoreRoutine(Hand hand, bool untilNone) {
             foreach(var grabbable in grabbableParents)
@@ -457,16 +512,7 @@ namespace Autohand {
             if (lockHandOnGrab)
                 hand.body.isKinematic = true;
 
-            body.collisionDetectionMode = body.isKinematic ? CollisionDetectionMode.ContinuousSpeculative : CollisionDetectionMode.ContinuousDynamic;
-            body.interpolation = RigidbodyInterpolation.None;
-            body.solverIterations = 100;
-            body.solverVelocityIterations = 100;
-            preheldDrag = body.drag;
-            preheldAngularDrag = body.angularDrag;
-            if(body.drag < minHeldDrag)
-                body.drag = minHeldDrag;
-            if(body.angularDrag < minHeldAngleDrag)
-                body.angularDrag = minHeldAngleDrag;
+            SetGrabbedRigidbodySettings();
 
             if(parentOnGrab) {
                 rootTransform.parent = hand.transform.parent;
@@ -475,8 +521,6 @@ namespace Autohand {
                 }
             }
 
-            if(heldNoFriction)
-                SetPhysicsMateiral(Resources.Load<PhysicMaterial>("NoFriction"));
 
             if(ignoreWeight) {
                 if(!body.gameObject.CanGetComponent(out WeightlessFollower heldFollower))
@@ -486,14 +530,15 @@ namespace Autohand {
 
             collisionTracker.enabled = true;
 
-            placePoint?.Remove(this);
             heldBy?.Add(hand);
+            placePoint?.Remove(this);
             onGrab?.Invoke(hand, this);
             OnGrabEvent?.Invoke(hand, this);
 
             wasForceReleased = false;
             beingGrabbed = false;
         }
+
 
         /// <summary>Called by the hand whenever this item is release</summary>
         internal virtual void OnRelease(Hand hand){
@@ -504,10 +549,12 @@ namespace Autohand {
 
                 BreakHandConnection(hand);
 
+                SetThrowVelocity(hand.ThrowVelocity(), hand.ThrowAngularVelocity());
+
                 if(placePoint != null && canPlace)
                     placePoint.Place(this);
 
-                SetThrowVelocity(hand.ThrowVelocity(), hand.ThrowAngularVelocity());
+
 
                 OnReleaseEvent?.Invoke(hand, this);
                 onRelease?.Invoke(hand, this);
@@ -528,6 +575,8 @@ namespace Autohand {
             if (!heldBy.Remove(hand))
                 return;
 
+            ResetGrabbableAfterRlease();
+
             foreach(var collider in heldIgnoreColliders)
                 hand.HandIgnoreCollider(collider, false);
 
@@ -540,35 +589,10 @@ namespace Autohand {
             if(gameObject.activeInHierarchy && !beingDestroyed)
                 StartIgnoreRoutine(hand, true);
 
+            if(beingGrabbedBy.Count == 0 && waitingToGrabHands.Count == 0)
+                beingGrabbed = false;
 
-            ResetRigidbody();
-
-
-            if(HeldCount(true, true, true) == 0) {
-                ResetGrabbableAfterRlease();
-            }
-
-            if(HeldCount(false, false, false) == 0) {
-                if(heldNoFriction) {
-                    ResetPhysicsMateiral();
-                    foreach(var grabbable in grabbableParents)
-                        grabbable.ResetPhysicsMateiral();
-                }
-
-                if(body != null) {
-                    body.solverIterations = Physics.defaultSolverIterations;
-                    body.solverVelocityIterations = Physics.defaultSolverVelocityIterations;
-
-                    if(body.drag == minHeldDrag && preheldDrag != 0)
-                        body.drag = preheldDrag;
-                    if(body.angularDrag == minHeldAngleDrag && preheldAngularDrag != 0)
-                        body.angularDrag = preheldAngularDrag;
-                    preheldDrag = 0;
-                    preheldAngularDrag = 0;
-                }
-                collisionTracker.enabled = false;
-                lastHeldBy = hand;
-            }
+            lastHeldBy = hand;
         }
 
         /// <summary>Tells each hand holding this object to release</summary>
@@ -585,6 +609,11 @@ namespace Autohand {
 
         /// <summary>Forces all the hands on this object to relese without applying throw force or calling OnRelease event</summary>
         public virtual void ForceHandsRelease() {
+            for(int i = waitingToGrabHands.Count - 1; i >= 0; i--) {
+                waitingToGrabHands[i].BreakGrabConnection();
+                waitingToGrabHands.RemoveAt(i);
+            }
+
             for(int i = beingGrabbedBy.Count - 1; i >= 0; i--) {
                 beingGrabbedBy[i].BreakGrabConnection();
             }
@@ -750,12 +779,16 @@ namespace Autohand {
             }
         }
 
+
+        /// <summary>Returns the velocity of the grabbable, old function, recommend using body.velocity instead</summary>
         public Vector3 GetVelocity() {
             if (body == null)
                 return Vector3.zero;
             return lastCenterOfMassPos - body.position;
         }
 
+
+        /// <summary>Returns the angular velocity of the grabbable, old function, recommend using body.velocity instead</summary>
         public Vector3 GetAngularVelocity() {
             Quaternion deltaRotation = body.rotation * Quaternion.Inverse(lastCenterOfMassRot);
             deltaRotation.ToAngleAxis(out var angle, out var axis);
@@ -764,13 +797,20 @@ namespace Autohand {
         }
 
 
-
+        /// <summary>
+        /// Adds a grabbable as a child to this one.
+        /// A grabbable child is usually applied automatically when a grabbable parented below this another grabbable. 
+        /// This connects the grabbable and allows events to be called and settings to be changed
+        /// </summary>
         public void AddChildGrabbable(Grabbable grab) {
             if(!grabbableChildren.Contains(grab))
                 grabbableChildren.Add(grab);
 
         }
 
+        /// <summary>
+        /// Removes a grabbable as a child to this one.
+        /// </summary>
         public void RemoveChildGrabbable(Grabbable grab) {
             if(grabbableChildren.Contains(grab))
                 grabbableChildren.Remove(grab);
@@ -808,11 +848,14 @@ namespace Autohand {
                 jointedBodies.RemoveAt(i);
 
                 if (body.gameObject.HasGrabbable(out var otherGrabbable)) {
-                    if(jointedGrabbables.Contains(otherGrabbable)) 
+                    if(jointedGrabbables.Contains(otherGrabbable)) {
                         jointedGrabbables.Remove(otherGrabbable);
+                        if(otherGrabbable.HeldCount(false, true, true) == 0) {
+                            otherGrabbable.rootTransform.parent = otherGrabbable.originalParent;
+                            otherGrabbable.ResetGrabbedRigidbodySettings();
+                        }
+                    }
 
-                     if(otherGrabbable.HeldCount() == 0 && HeldCount() == 0)
-                        otherGrabbable.rootTransform.parent = otherGrabbable.originalParent;
                 }
                 else
                     body.transform.parent = jointedParents[i];
@@ -843,6 +886,28 @@ namespace Autohand {
             return count;
         }
 
+
+        /// <summary>Sets the given place point to ignore this grabbables and all it's children</summary>
+        public void PlacePointIgnore(PlacePoint point) {
+            point.dontAllows.Add(rootGrabbable);
+            foreach(var grabbable in rootGrabbable.grabbableChildren) {
+                if(grabbable != this)
+                    point.dontAllows.Add(grabbable);
+            }
+        }
+
+
+        /// <summary>Sets the given place point to allow this grabbables and all it's children</summary>
+        public void PlacePointAllow(PlacePoint point) {
+            if(point.dontAllows.Contains(rootGrabbable))
+                point.dontAllows.Remove(rootGrabbable);
+            foreach(var grabbable in rootGrabbable.grabbableChildren) {
+                if(grabbable != this && point.dontAllows.Contains(grabbable))
+                    point.dontAllows.Remove(grabbable);
+            }
+        }
+
+
         //Adds a reference script to child colliders so they can be grabbed
         void MakeChildrenGrabbable() {
             for(int i = 0; i < transform.childCount; i++) {
@@ -850,7 +915,7 @@ namespace Autohand {
             }
 
             void AddChildGrabbableRecursive(Transform obj) {
-                if(obj.CanGetComponent(out Collider col) && col.isTrigger == false && !obj.CanGetComponent<Grabbable>(out _) && !obj.CanGetComponent<GrabbableChild>(out _) && !obj.CanGetComponent<PlacePoint>(out _)) {
+                if(obj.CanGetComponent(out Collider col) && col.isTrigger == false && !obj.CanGetComponent<IGrabbableEvents>(out _) && !obj.CanGetComponent<GrabbableChild>(out _) && !obj.CanGetComponent<PlacePoint>(out _)) {
                     var child = obj.gameObject.AddComponent<GrabbableChild>();
                     child.grabParent = this;
                 }
@@ -879,6 +944,76 @@ namespace Autohand {
         }
 
 
+        bool rigidbodyGrabbedState;
+        internal void SetGrabbedRigidbodySettings() {
+            if(rigidbodyGrabbedState == false) {
+                rigidbodyGrabbedState = true;
+
+                if(body != null) {
+                    body.collisionDetectionMode = body.isKinematic ? CollisionDetectionMode.ContinuousSpeculative : CollisionDetectionMode.ContinuousDynamic;
+                    body.interpolation = RigidbodyInterpolation.None;
+                    body.solverIterations = 100;
+                    body.solverVelocityIterations = 100;
+
+                    preheldDrag = body.drag;
+                    preheldAngularDrag = body.angularDrag;
+
+                    if(preheldDrag == 0 && body.drag < minHeldDrag) {
+                        body.drag = minHeldDrag;
+                    }
+                    if(preheldAngularDrag == 0 && body.angularDrag < minHeldAngleDrag) {
+                        body.angularDrag = minHeldAngleDrag;
+                    }
+
+
+                    for(int i = 0; i < jointedBodies.Count; i++) {
+                        if(jointedBodies[i] != null && jointedBodies[i].gameObject.HasGrabbable(out var grab) && grab != this) {
+                            grab.SetGrabbedRigidbodySettings();
+                        }
+                    }
+
+                }
+
+                if(heldNoFriction) {
+                    var colliderMat = Resources.Load<PhysicMaterial>("NoFriction");
+                    SetPhysicsMateiral(colliderMat);
+                }
+            }
+        }
+
+
+        //Resets to original collision dection
+        protected void ResetGrabbedRigidbodySettings() {
+            if(rigidbodyGrabbedState) {
+                if(body != null) {
+                    body.collisionDetectionMode = detectionMode;
+                    body.interpolation = startInterpolation;
+                    body.solverIterations = Physics.defaultSolverIterations;
+                    body.solverVelocityIterations = Physics.defaultSolverVelocityIterations;
+
+                    if(preheldDrag != 0) {
+                        body.drag = preheldDrag;
+                    }
+                    if(preheldAngularDrag != 0) {
+                        body.angularDrag = preheldAngularDrag;
+                    }
+
+                    preheldDrag = 0;
+                    preheldAngularDrag = 0;
+                }
+
+                if(heldNoFriction) {
+                    ResetPhysicsMateiral();
+                    foreach(var grabbable in grabbableParents)
+                        grabbable.ResetPhysicsMateiral();
+                }
+
+                rigidbodyGrabbedState = false;
+                collisionTracker.enabled = false;
+            }
+        }
+
+
         /// <summary>INTERNAL - Sets the grabbables original layers</summary>
         internal void ResetGrabbableAfterRlease() {
             if(!beingDestroyed) {
@@ -887,10 +1022,16 @@ namespace Autohand {
                     rootTransform.parent = originalParent;
                 }
 
+                if(HeldCount() == 0) {
+                    ResetGrabbedRigidbodySettings();
+                }
+
                 for(int i = 0; i < jointedBodies.Count; i++) {
                     if(jointedBodies[i].gameObject.HasGrabbable(out var grab)) {
-                        if(grab.HeldCount() == 0)
+                        if(grab.HeldCount() == 0) {
                             grab.rootTransform.parent = grab.originalParent;
+                            grab.ResetGrabbedRigidbodySettings();
+                        }
                         else if(parentOnGrab && grab.rootTransform.parent != grab.originalParent) {
                             rootTransform.parent = grab.rootTransform.parent;
                         }
@@ -922,6 +1063,39 @@ namespace Autohand {
             }
 
             return false;
+        }
+
+        public void OnHighlight(Hand hand) {
+            Highlight(hand);
+        }
+
+        public void OnUnhighlight(Hand hand) {
+            OnUnhighlight(hand);
+        }
+
+        void IGrabbableEvents.OnGrab(Hand hand) {
+            OnGrab(hand);
+        }
+
+        void IGrabbableEvents.OnRelease(Hand hand) {
+            OnRelease(hand);
+        }
+
+        public Grabbable GetGrabbable() {
+            return this;
+        }
+
+        public bool CanGrab(Hand hand) {
+            return hand.CanGrab(this);
+        }
+
+
+        internal void AddWaitingForGrab(Hand hand) {
+            waitingToGrabHands.Add(hand);
+        }
+
+        internal void RemoveWaitingForGrab(Hand hand) {
+            waitingToGrabHands.Remove(hand);
         }
     }
 }

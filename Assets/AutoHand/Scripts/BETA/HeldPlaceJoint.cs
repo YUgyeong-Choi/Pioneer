@@ -32,8 +32,8 @@ namespace Autohand {
         GrabbableHeldJoint heldJoint = null;
 
 
-        protected override void Start() {
-            base.Start();
+        protected  void Start() {
+            //base.Start();
             //heldPlaceOnly = true;
             disableRigidbodyOnPlace = false;
             parentOnPlace = true;
@@ -43,7 +43,7 @@ namespace Autohand {
             
         }
 
-        public override bool CanPlace(Grabbable placeObj) {
+        public override bool CanPlace(Grabbable placeObj, bool checkRoot = true) {
             if(placeObj.body == connectedGrabbable.body)
                 return false;
 

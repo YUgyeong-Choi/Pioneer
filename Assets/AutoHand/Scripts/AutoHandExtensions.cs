@@ -106,7 +106,7 @@ namespace Autohand
         }
 
         /// <summary>Returns true if there is a grabbable or link, out null if there is none</summary>
-        public static bool HasGrabbable(this GameObject obj, out Grabbable grabbable)
+        public static bool HasGrabbable(this GameObject obj, out Grabbable grabbable, bool includeDisabled = false)
         {
             if (obj == null)
             {
@@ -114,13 +114,21 @@ namespace Autohand
                 return false;
             }
 
-            if (obj.CanGetComponent(out grabbable))
+
+            if(obj.CanGetComponent(out IGrabbableEvents grabbableEvents)) {
+                if(grabbableEvents.GetGrabbable() != null && (includeDisabled || grabbableEvents.GetGrabbable().enabled)) {
+                    grabbable = grabbableEvents.GetGrabbable();
+                    return true;
+                }
+            }
+
+            if (obj.CanGetComponent(out grabbable) && (includeDisabled || grabbable.enabled))
             {
                 return true;
             }
 
             GrabbableChild grabChild;
-            if (obj.CanGetComponent(out grabChild))
+            if (obj.CanGetComponent(out grabChild) && (includeDisabled || grabChild.grabParent.enabled))
             {
                 grabbable = grabChild.grabParent;
                 return true;

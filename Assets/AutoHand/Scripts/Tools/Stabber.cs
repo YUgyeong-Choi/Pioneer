@@ -175,7 +175,6 @@ namespace Autohand {
             if(stabbedFrames[stab] < STABFRAMES)
                 return;
 
-
             stabbed.Add(stab);
             var joint = gameObject.AddComponent<ConfigurableJoint>();
             joint.secondaryAxis = axis;

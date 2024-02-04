@@ -1,3 +1,32 @@
+Auto Have V3.3.0
+Improvements:
+- Held Inventory Place Point Example
+- Added [Shape Type] value, which allows you to toggle the shape of a place point between a sphere and a box
+- Added [Resize on Place] option to place points, when enabled placed objects will automatically scale and center to fit the place point. (Only supports instant grabbing)
+- Added [Grabbable Point] toggle to place points, if enabled the place point will directly become a grabbable reference using its radius
+- Added [Match Position] and [Match Rotation] toggles to the place point, if disabled the place object will take whatever position/rotation it was in during placement instead of matching the place point position/rotation
+- Added Place Point Animation script which allows for a number of simple configurations for making simple smooth animations
+- Added Place Point Sound Effects script which takes an audio source and a clip for Highlight, Unhighlight, Place, Remove sounds
+- Better support for grabbables with place points attached
+- Grabbables will now check for childed place point on start and prevent themselves from being placed in their own points
+- Added support for recursive place point placement (Held inventories can be safely placed into other inventories and place points)
+- Added IGrabbableEvents interface, that can be added to components and allows for custom functionality with highlighting and grabbing events from the hands. Used by the place point to support the grabbable point option
+
+Bug fixes:
+- FIXED LINKS TO OLD DOCUMENTATION ON ASSET STORE - IF YOU ARE USING THE NOTION DOCUMENTATION PLEASE SWITCH TO LATEST GITBOOK https://earnest-robot.gitbook.io/auto-hand-docs/
+- Made some adjustments to the hand movement system to help improve the consistency of the physic interactions between different physics timesteps
+- Fixed bug with weightless grabbable option not working when the grabbable is a child of a rigidbody instead of on the same object
+- Fixed bug where the hand would jump when holding the hand on a surface and moving the player
+- Fixed bug with OVR Demo where a script is spamming an missing reference error
+- Fixed bug where hand tracking would disable controllers when only one hand is detected as tracking
+- Fixed bug where hand tracking won't work properly when loading in with hands before loading with controllers
+- Moved a logo that was causing inconsistent build errors for some people into an editor folder
+- Added LateUpdateHandPose toggle on AutoVRIK as a potential fix for animation controllers overriding the hand poses when trying to animate full body poses
+- Made some private values and functions in AutoHandPlayer + PlacePoints protected or public
+- Added support for grabbing grabbables using trigger colliders
+- Removed the requirecomponent rigidbody requirement on a few addon scripts (throw events, sticky, magnetic) to allow them to be compatible with held place points
+
+
 V3.2.5
 Bug Fixes
 - Fixed bug with demo scene not working properly
