@@ -12,7 +12,7 @@ public class RandomTips : MonoBehaviour
     void Start()
     {
         SetRandomTip();
-        Invoke("LoadNextScene", 10f); //여기에 서버 연동이 완료되면
+        Invoke("LoadNextScene", 5f); //여기에 서버 연동이 완료되면
     }
 
     void SetRandomTip()
