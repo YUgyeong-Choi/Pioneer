@@ -707,9 +707,7 @@ namespace Autohand {
         public void SetMoveTo(bool ignoreHeld = false) {
             if(follow == null)
                 return;
-
-
-
+            
             //Sets [Move To] Object
             moveTo.position = follow.position + grabPositionOffset;
             moveTo.rotation = follow.rotation * grabRotationOffset;

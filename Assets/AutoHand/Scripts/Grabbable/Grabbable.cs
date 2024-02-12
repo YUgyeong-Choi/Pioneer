@@ -47,7 +47,7 @@ namespace Autohand {
         [Tooltip("This will NOT parent the object under the hands on grab. This will parent the object to the parents of the hand, which allow you to move the hand parent object smoothly while holding an item, but will also allow you to move items that are very heavy - recommended for all objects that aren't very heavy or jointed to other rigidbodies")]
         public bool parentOnGrab = true;
 
-
+    
         [Header("Held Settings")]
 
         [Tooltip("Replaces the physics material with the resources NoFriction material while held")]
@@ -328,8 +328,11 @@ namespace Autohand {
 
 
         public void IgnoreColliders(Collider collider, bool ignore = true) {
-            foreach(var col in grabColliders)
+            foreach (var col in grabColliders)
+            {
+                if (!col) continue;
                 Physics.IgnoreCollision(collider, col, ignore);
+            }
         }
 
         public void IgnoreColliders(Collider[] colliders, bool ignore = true)

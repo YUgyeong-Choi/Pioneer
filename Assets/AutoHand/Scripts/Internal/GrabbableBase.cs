@@ -291,7 +291,11 @@ namespace Autohand {
 
         public bool IsGrabbableOverlapping(Grabbable other) {
             foreach(var col1 in grabColliders) {
-                foreach(var col2 in other.grabColliders) {
+                foreach(var col2 in other.grabColliders)
+                {
+
+                    if (!col1 || !col2) continue;
+                    
                     if(col1.enabled && !col1.isTrigger && !col1.isTrigger && col2.enabled && !col2.isTrigger && !col2.isTrigger &&
                         Physics.ComputePenetration(col1, col1.transform.position, col1.transform.rotation, col2, col2.transform.position, col2.transform.rotation, out _, out _)) {
                         return true;
@@ -305,6 +309,9 @@ namespace Autohand {
         public void IgnoreGrabbableColliders(Grabbable other, bool ignore) {
             foreach(var col1 in grabColliders) {
                 foreach(var col2 in other.grabColliders) {
+                    
+                    if(!col1 || !col2) continue;
+                    
                     Physics.IgnoreCollision(col1, col2, ignore);
                 }
             }
@@ -357,7 +364,10 @@ namespace Autohand {
             }
 
             foreach (var col in grabColliders)
+            {
+                if (!col) continue;
                 hand.HandIgnoreCollider(col, ignore);
+            }
 
             foreach(var grab in grabbableChildren)
                 foreach(var col in grab.grabColliders)
@@ -378,7 +388,11 @@ namespace Autohand {
             float dist;
             Vector3 dir;
             foreach(var col2 in grabColliders) {
-                foreach(var col1 in hand.handColliders) {
+                foreach(var col1 in hand.handColliders)
+                {
+
+                    if (!col1 || !col2) continue;
+                    
                     if(col1.enabled && !col1.isTrigger && !col1.isTrigger && col2.enabled && !col2.isTrigger && !col2.isTrigger && 
                     Physics.ComputePenetration(col1, col1.transform.position, col1.transform.rotation, col2, col2.transform.position, col2.transform.rotation, out dir, out dist)) {
                         return true;
@@ -415,6 +429,9 @@ namespace Autohand {
         /// <summary>Resets the physics materials on all the colliders to how it was during Start()</summary>
         public void SetPhysicsMateiral(PhysicMaterial physMat) {
             foreach(var collider in grabColliders) {
+                
+                if(!collider) continue;
+                
                 collider.material = physMat;
             }
         }
