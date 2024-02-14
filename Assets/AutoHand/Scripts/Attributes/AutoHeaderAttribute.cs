@@ -1,11 +1,10 @@
 using UnityEngine;
 using System.Reflection;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Autohand
-{
     public class AutoHeaderAttribute : PropertyAttribute
     {
         public int count;
@@ -45,6 +44,7 @@ namespace Autohand
             this.tooltip = tooltip;
         }
     }
+
 #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(AutoHeaderAttribute))]
     public class AutoHeaderDrawer : PropertyDrawer
@@ -82,8 +82,12 @@ namespace Autohand
             var labelStyle = Constants.HeaderStyle;
             labelStyle.font = labelFont;
 
-            if (autohandlogo == null)
-                autohandlogo = Resources.Load<Texture>("AutoHandLogo");
+            if(autohandlogo == null) {
+                var assets = AssetDatabase.FindAssets("AutohandLogo");
+                if(assets.Length > 0)
+                    autohandlogo = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath(assets[0]));
+            }
+
             EditorGUI.LabelField(headerRect, new GUIContent(" " + attr.label, autohandlogo, attr.tooltip), labelStyle);
 
 
@@ -91,31 +95,29 @@ namespace Autohand
             EditorGUILayout.Space();
             position.y += 2f;
         }
-
     }
 
 
-    public static class Constants{
-        private static readonly Color[] _barColors = new Color[5] {
-            new Color(0.3411765f, 0.6039216f, 0.7803922f),
-            new Color(0.145098f, 0.6f, 0.509804f),
-            new Color(0.9215686f, 0.6431373f, 0.282353f),
-            new Color(0.8823529f, 0.3529412f, 0.4039216f),
-            new Color(0.9529412f, 0.9294118f, 0.682353f)
-        };
+public static class Constants{
+    private static readonly Color[] _barColors = new Color[5] {
+        new Color(0.3411765f, 0.6039216f, 0.7803922f),
+        new Color(0.145098f, 0.6f, 0.509804f),
+        new Color(0.9215686f, 0.6431373f, 0.282353f),
+        new Color(0.8823529f, 0.3529412f, 0.4039216f),
+        new Color(0.9529412f, 0.9294118f, 0.682353f)
+    };
 
-        public static Color ColorForDepth(int depth) => _barColors[depth % _barColors.Length];
+    public static Color ColorForDepth(int depth) => _barColors[depth % _barColors.Length];
 
-        public static Color BackgroundColor { get; } = EditorGUIUtility.isProSkin ? new Color(0.18f, 0.18f, 0.18f, 0.75f) : new Color(0.7f, 0.7f, 0.7f, 0.75f);
+    public static Color BackgroundColor { get; } = EditorGUIUtility.isProSkin ? new Color(0.18f, 0.18f, 0.18f, 0.75f) : new Color(0.7f, 0.7f, 0.7f, 0.75f);
         
-        public static GUIStyle LabelStyle { get; } = new GUIStyle(GUI.skin.label){
-            alignment = TextAnchor.MiddleLeft,
-            fontSize = 15
-        };
-        public static GUIStyle HeaderStyle { get; } = new GUIStyle(GUI.skin.label){
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = 26
-        };
-    }
-#endif
+    public static GUIStyle LabelStyle { get; } = new GUIStyle(GUI.skin.label){
+        alignment = TextAnchor.MiddleLeft,
+        fontSize = 15
+    };
+    public static GUIStyle HeaderStyle { get; } = new GUIStyle(GUI.skin.label){
+        alignment = TextAnchor.MiddleCenter,
+        fontSize = 26
+    };
 }
+#endif

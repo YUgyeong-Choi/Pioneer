@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 
 namespace Autohand {
 
@@ -115,12 +116,12 @@ namespace Autohand {
         [NonSerialized, Tooltip("Follow target speed (Can cause jittering if turned too high - recommend increasing drag with speed)"), Min(0)]
         public float followPositionStrength = 60;
         [HideInInspector, NonSerialized]
-        public float startDrag = 10;
+        public float startDrag = 12;
 
         [HideInInspector, NonSerialized, Tooltip("Follow target rotation speed (Can cause jittering if turned too high - recommend increasing angular drag with speed)"), Min(0)]
-        public float followRotationStrength = 110;
+        public float followRotationStrength = 150;
         [HideInInspector, NonSerialized]
-        public float startAngularDrag = 35;
+        public float startAngularDrag = 60;
 
          [HideInInspector, NonSerialized, Tooltip("After this many seconds velocity data within a 'throw window' will be tossed out. (This allows you to get only use acceeleration data from the last 'x' seconds of the throw.)")]
         public float throwVelocityExpireTime = 0.125f;
@@ -128,7 +129,7 @@ namespace Autohand {
         public float throwAngularVelocityExpireTime = 0.25f;
 
         [HideInInspector, NonSerialized, Tooltip("Increase for closer finger tip results / Decrease for less physics checks - The number of steps the fingers take when bending to grab something")]
-        public int fingerBendSteps = 100;
+        public int fingerBendSteps = 40;
 
         [HideInInspector]
         public bool usingPoseAreas = true;
@@ -209,17 +210,17 @@ namespace Autohand {
             }
         }
 
-        protected GrabbablePose _grabPose;
-        protected GrabbablePose grabPose {
+        protected GrabbablePose _currentHeldPose;
+        public GrabbablePose currentHeldPose {
             get {
-                return _grabPose;
+                return _currentHeldPose;
             }
     
-            set {
-                if(value == null && _grabPose != null)
-                    _grabPose.CancelHandPose(this as Hand);
+            protected set {
+                if(value == null && _currentHeldPose != null)
+                    _currentHeldPose.CancelHandPose(this as Hand);
 
-                _grabPose = value;
+                _currentHeldPose = value;
             }
         }
 
@@ -269,11 +270,36 @@ namespace Autohand {
             }
         }
 
+
+
+        BoxCollider _handEncapsulationCollider;
+        internal BoxCollider handEncapsulationBox {
+            get {
+                if(!gameObject.activeInHierarchy)
+                    _handEncapsulationCollider = null;
+                else if(gameObject.activeInHierarchy && _handEncapsulationCollider == null) {
+                    _handEncapsulationCollider = new GameObject().AddComponent<BoxCollider>();
+                    _handEncapsulationCollider.name = "handEncapsulationBox";
+                    _handEncapsulationCollider.transform.parent = transform;
+                    _handEncapsulationCollider.transform.localPosition = Vector3.zero;
+                    _handEncapsulationCollider.transform.localRotation = Quaternion.identity;
+                    _handEncapsulationCollider.transform.localScale = Vector3.one;
+                    _handEncapsulationCollider.isTrigger = true;
+                    _handEncapsulationCollider.enabled = false;
+                }
+
+                return _handEncapsulationCollider;
+            }
+        }
+
+
+
         internal int handLayers;
         internal int handIgnoreCollisionLayers;
 
         protected Collider palmCollider;
         protected RaycastHit highlightHit;
+        protected RaycastHit grabbingHit;
 
         protected HandVelocityTracker velocityTracker;
         protected Transform palmChild;
@@ -348,6 +374,23 @@ namespace Autohand {
                     Debug.Log("AUTO HAND: Creating Dynamic Timestepper");
                 }
             }
+
+
+            //Update the hand encapsulation sphere
+            var bounds = new Bounds(Vector3.zero, Vector3.zero);
+            foreach(var finger in fingers) {
+                var fingerJoints = finger.FingerJoints;
+                for(int i = 0; i < fingerJoints.Length; i++)
+                    bounds.Encapsulate(transform.InverseTransformPoint(fingerJoints[i].position));
+                bounds.Encapsulate(transform.InverseTransformPoint(finger.tip.position + (finger.tip.position - transform.position)*finger.tipRadius));
+            }
+
+            bounds.Encapsulate(transform.InverseTransformPoint(palmTransform.position + palmTransform.forward*0.01f));
+            bounds.Encapsulate(transform.InverseTransformPoint(palmTransform.position - palmTransform.forward*0.01f));
+
+            handEncapsulationBox.center = bounds.center;
+            handEncapsulationBox.size = bounds.size;
+            handEncapsulationBox.gameObject.layer = LayerMask.NameToLayer("Hand");
         }
 
         protected virtual void OnEnable() {
@@ -404,6 +447,9 @@ namespace Autohand {
                 updatePositionTracked[i] = updatePositionTracked[i - 1];
             updatePositionTracked[0] = transform.localPosition;
 
+
+
+            //Update the finger sway
             if(!IsGrabbing())
                 UpdateFingers(Time.fixedDeltaTime);
         }
@@ -437,6 +483,11 @@ namespace Autohand {
 
 
 
+
+        /// <summary>Creates Joints between hand and grabbable, does not call grab events</summary>
+        protected virtual void CreateJoint(Grabbable grab) {
+            CreateJoint(grab, grab.jointBreakForce, float.PositiveInfinity);
+        }
 
         /// <summary>Creates Joints between hand and grabbable, does not call grab events</summary>
         protected virtual void CreateJoint(Grabbable grab, float breakForce, float breakTorque){
@@ -528,10 +579,17 @@ namespace Autohand {
                     vel.y = Mathf.Clamp(vel.y, -velocityClamp, velocityClamp);
                     vel.z = Mathf.Clamp(vel.z, -velocityClamp, velocityClamp);
 
+                    var deltaOffset = Time.fixedDeltaTime / 0.011111f;
+                    var inverseDeltaOffset = 0.011111f / Time.fixedDeltaTime;
+                    var currentVelocity = body.velocity;
+                    body.drag = startDrag * inverseDeltaOffset;
+                    var maxDelta = deltaOffset;
+                    minVelocityChange *= deltaOffset;
+
                     var towardsVel = new Vector3(
-                        Mathf.MoveTowards(body.velocity.x, vel.x, minVelocityChange + Mathf.Abs(body.velocity.x) * Time.fixedDeltaTime * 60),
-                        Mathf.MoveTowards(body.velocity.y, vel.y, minVelocityChange + Mathf.Abs(body.velocity.y) * Time.fixedDeltaTime * 60),
-                        Mathf.MoveTowards(body.velocity.z, vel.z, minVelocityChange + Mathf.Abs(body.velocity.z) * Time.fixedDeltaTime * 60)
+                        Mathf.MoveTowards(currentVelocity.x, vel.x, minVelocityChange + Mathf.Abs(currentVelocity.x) * maxDelta),
+                        Mathf.MoveTowards(currentVelocity.y, vel.y, minVelocityChange + Mathf.Abs(currentVelocity.y) * maxDelta),
+                        Mathf.MoveTowards(currentVelocity.z, vel.z, minVelocityChange + Mathf.Abs(currentVelocity.z) * maxDelta)
                     );
 
                     body.velocity = towardsVel;
@@ -554,14 +612,17 @@ namespace Autohand {
             Vector3 angular = multiLinear * axis.normalized;
             angle = Mathf.Abs(angle);
 
-            var angleStrengthOffset = Mathf.Lerp(1f, 2f, angle / 45f);
-            body.angularDrag = Mathf.Lerp(startAngularDrag + 25, startAngularDrag, angle/4f);
+            var angleStrengthOffset = Mathf.Lerp(1f, 1.5f, angle/16f);
+            var inverseDeltaOffset = 0.011111f / Time.fixedDeltaTime;
+            var maxDelta = followRotationStrength * 50f * angleStrengthOffset;
+            var currentAngleVelocity = body.angularVelocity;
 
+            body.angularDrag = Mathf.Lerp((startAngularDrag * 1.2f), startAngularDrag, angle/4f) * inverseDeltaOffset;
 
             body.angularVelocity = new Vector3(
-                Mathf.MoveTowards(body.angularVelocity.x, angular.x, followRotationStrength * 5f * Time.fixedDeltaTime * 60 * angleStrengthOffset),
-                Mathf.MoveTowards(body.angularVelocity.y, angular.y, followRotationStrength * 5f * Time.fixedDeltaTime * 60 * angleStrengthOffset),
-                Mathf.MoveTowards(body.angularVelocity.z, angular.z, followRotationStrength * 5f * Time.fixedDeltaTime * 60 * angleStrengthOffset)
+                Mathf.MoveTowards(currentAngleVelocity.x, angular.x, maxDelta),
+                Mathf.MoveTowards(currentAngleVelocity.y, angular.y, maxDelta),
+                Mathf.MoveTowards(currentAngleVelocity.z, angular.z, maxDelta)
             );
 
             lastAngularVelocity = body.angularVelocity;
@@ -591,18 +652,18 @@ namespace Autohand {
                     handRuler.rotation = rot;
 
                     var deltaHandRot = rot * Quaternion.Inverse(transform.rotation);
-                
                     var deltaGrabPos = grabRuler.position - holdingObj.body.transform.position;
                     var deltaGrabRot = Quaternion.Inverse(grabRuler.rotation) * holdingObj.body.transform.rotation;
 
                     transform.position = handRuler.position;
                     transform.rotation = handRuler.rotation;
-                    body.position = transform.position;
-                    body.rotation = transform.rotation;
+                    body.position = handRuler.position;
+                    body.rotation = handRuler.rotation;
+
                     holdingObj.body.transform.position = grabRuler.position;
                     holdingObj.body.transform.rotation = grabRuler.rotation;
-                    holdingObj.body.position = holdingObj.body.transform.position;
-                    holdingObj.body.rotation = holdingObj.body.transform.rotation;
+                    holdingObj.body.position = grabRuler.position;
+                    holdingObj.body.rotation = grabRuler.rotation;
 
                     body.velocity = deltaHandRot * body.velocity;
                     body.angularVelocity = deltaHandRot * body.angularVelocity;
@@ -616,10 +677,7 @@ namespace Autohand {
                         }
 
                     velocityTracker.ClearThrow();
-
                 }
-
-
             }
             else {
                 ignoreMoveFrame = true;
@@ -649,7 +707,7 @@ namespace Autohand {
         public void SetMoveTo(bool ignoreHeld = false) {
             if(follow == null)
                 return;
-
+            
             //Sets [Move To] Object
             moveTo.position = follow.position + grabPositionOffset;
             moveTo.rotation = follow.rotation * grabRotationOffset;
@@ -670,16 +728,20 @@ namespace Autohand {
                 }
             }
 
-            //This is a to forumla help stabilize an objects when held by multiple hands
+            //This is a forumla to help stabilize an object when held by multiple hands
             //It's more art than science, but it works well enough
-            if(!ignoreHeld && holdingObj != null){ //&& !holdingObj.ignoreWeight) {
-                var heldBy = holdingObj.GetHeldBy(true, true);
-                for(int i = 0; i < heldBy.Count; i++)
-                    if(heldBy[i] != this && holdingObj.moveTos.ContainsKey(heldBy[i])) {
-                        var mag = (holdingObj.moveTos[heldBy[i]]).magnitude*8f ;
-                        mag = Mathf.Lerp(1.5f, 1.05f, mag);
-                        moveTo.position += holdingObj.moveTos[heldBy[i]] / mag * (heldBy[i].body.mass/body.mass);
+            if(holdingObj != null && holdingObj.HeldCount() > 0 && !ignoreHeld) {
+                var deltaOffset = 0.011111f/Time.fixedDeltaTime;
+                var heldBy = holdingObj.rootGrabbable.GetHeldBy(true, true);
+                for(int i = 0; i < heldBy.Count; i++) {
+                    //If the grabbable is held by another hand, we want to move towards that hand when its being pulled away to reduce jitter
+                    if(heldBy[i] != this && holdingObj.rootGrabbable.moveTos.ContainsKey(heldBy[i])) {
+                        var otherHandOffset = holdingObj.rootGrabbable.moveTos[heldBy[i]];
+                        var targetDistance = Mathf.Lerp(1f + 0.5f * deltaOffset, 1f + 0.05f * deltaOffset, otherHandOffset.magnitude*4);
+                        var massOffset = heldBy[i].body.mass/body.mass;
+                        moveTo.position += (otherHandOffset / targetDistance) * massOffset;
                     }
+                }
             }
         }
 
@@ -701,7 +763,7 @@ namespace Autohand {
 
         Collider[] handHighlightNonAlloc = new Collider[128];
         /// <summary>Finds the closest raycast from a cone of rays -> Returns average direction of all hits</summary>
-        protected virtual Vector3 HandClosestHit(out RaycastHit closestHit, out Grabbable grabbable, float dist, int layerMask, Grabbable target = null) {
+        protected virtual Vector3 HandClosestHit(out RaycastHit closestHit, out IGrabbableEvents grabbable, float dist, int layerMask, Grabbable target = null) {
             Grabbable grab;
             Vector3 palmForward = palmTransform.forward;
             Vector3 palmPosition = palmTransform.position;
@@ -714,7 +776,7 @@ namespace Autohand {
             closestGrabs.Clear();
             closestHits.Clear();
             var checkSphereRadius = reachDistance * 1.35f;
-            int overlapCount = Physics.OverlapSphereNonAlloc(palmPosition + palmForward * (checkSphereRadius * 0.9f), checkSphereRadius, handHighlightNonAlloc, layerMask, QueryTriggerInteraction.Ignore);
+            int overlapCount = Physics.OverlapSphereNonAlloc(palmPosition + palmForward * (checkSphereRadius * 0.9f), checkSphereRadius, handHighlightNonAlloc, layerMask, QueryTriggerInteraction.Collide);
 
 
             for(int i = 0; i < overlapCount; i++) {
@@ -724,14 +786,17 @@ namespace Autohand {
                     Vector3 closestPoint = col.ClosestPoint(palmTransform.transform.position);
                     ray.direction = closestPoint - palmTransform.position;
                 }
-                else {
+                else 
                     ray.direction = palmTransform.forward;
-                }
 
                 ray.origin = palmTransform.transform.position;
                 ray.origin = Vector3.MoveTowards(ray.origin, col.bounds.center, 0.001f);
 
-                if(ray.direction != Vector3.zero && Vector3.Angle(ray.direction, palmTransform.forward) < 100 && Physics.Raycast(ray, out hit, checkSphereRadius*2, layerMask, QueryTriggerInteraction.Ignore)) {
+                var queryTriggerInteraction = QueryTriggerInteraction.Ignore;
+                if(col.isTrigger)
+                    queryTriggerInteraction = QueryTriggerInteraction.Collide;
+
+                if(ray.direction != Vector3.zero && Vector3.Angle(ray.direction, palmTransform.forward) < 100 && Physics.Raycast(ray, out hit, checkSphereRadius*2, layerMask, queryTriggerInteraction)) {
 
                     rayHitObject = hit.collider.gameObject;
                     if(closestGrabs.Count > 0)
@@ -758,13 +823,25 @@ namespace Autohand {
                 closestHit = closestHits[0];
                 grabbable = closestGrabs[0];
                 Vector3 dir = Vector3.zero;
-                for(int i = 0; i < closestHitCount; i++) {
-                    if(closestHits[i].distance / closestGrabs[i].grabPriorityWeight < closestHit.distance / grabbable.grabPriorityWeight) {
-                        closestHit = closestHits[i];
-                        grabbable = closestGrabs[i];
-                    }
+                if(grabbable is Grabbable) {
+                    for(int i = 0; i < closestHitCount; i++) {
+                        if(closestHits[i].distance / closestGrabs[i].grabPriorityWeight < closestHit.distance / (grabbable as Grabbable).grabPriorityWeight) {
+                            closestHit = closestHits[i];
+                            grabbable = closestGrabs[i];
+                        }
 
-                    dir += closestHits[i].point - palmTransform.position;
+                        dir += closestHits[i].point - palmTransform.position;
+                    }
+                }
+                else {
+                    for(int i = 0; i < closestHitCount; i++) {
+                        if(closestHits[i].distance / closestGrabs[i].grabPriorityWeight < closestHit.distance ) {
+                            closestHit = closestHits[i];
+                            grabbable = closestGrabs[i];
+                        }
+
+                        dir += closestHits[i].point - palmTransform.position;
+                    }
                 }
 
                 if(holdingObj == null && !IsGrabbing()) {
@@ -794,7 +871,7 @@ namespace Autohand {
 
         float fingerSwayVel;
         /// <summary>Determines how the hand should look/move based on its flags</summary>
-        protected virtual void UpdateFingers(float deltaTime) {
+        public virtual void UpdateFingers(float deltaTime) {
             var averageVel = Vector3.zero;
             for (int i = 1; i < updatePositionTracked.Length; i++)
                 averageVel += updatePositionTracked[i] - updatePositionTracked[i - 1];

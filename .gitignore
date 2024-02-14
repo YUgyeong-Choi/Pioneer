@@ -74,3 +74,21 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /.idea/*
+Assets/vRuler/VRuler.asmdef
+Assets/vRuler/VRuler.asmdef.meta
+Assets/vRuler/VRuler.cs
+Assets/vRuler/VRuler.cs.meta
+Assets/vRuler/VRulerLibs.cs
+Assets/vRuler/VRulerLibs.cs.meta
+Assets/vRuler/VRulerMenuItems.cs
+Assets/vRuler/VRulerMenuItems.cs.meta
+Assets/vRuler.meta
+Assets/vRuler/Manual.pdf
+Assets/vRuler/Manual.pdf.meta
+Assets/vRuler/Objects for scale.meta
+Assets/vRuler/Objects for scale/Car.obj
+Assets/vRuler/Objects for scale/Car.obj.meta
+Assets/vRuler/Objects for scale/House.obj
+Assets/vRuler/Objects for scale/House.obj.meta
+Assets/vRuler/Objects for scale/Human.obj
+Assets/vRuler/Objects for scale/Human.obj.meta

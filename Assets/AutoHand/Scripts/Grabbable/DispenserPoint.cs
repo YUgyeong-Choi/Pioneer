@@ -96,7 +96,8 @@ namespace Autohand {
 
                 if(dispensePool[poolIndex].HasGrabbable(out var grab)) {
                     grab.ForceHandsRelease();
-
+                    if(grab.placePoint != null)
+                        grab.placePoint.Remove();
                     if(grab.body == null)
                         grab.ActivateRigidbody();
 

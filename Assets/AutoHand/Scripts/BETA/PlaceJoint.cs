@@ -61,8 +61,8 @@ namespace Autohand {
         Quaternion prePlacedRot;
 
 
-        protected override void Start() {
-            base.Start();
+        protected void Start() {
+            //base.Start();
             base.makePlacedKinematic = false;
             base.placedJointLink = null;
         }
@@ -70,7 +70,7 @@ namespace Autohand {
             base.Highlight(placeObj);
         }
 
-        public override bool CanPlace(Grabbable placeObj) {
+        public override bool CanPlace(Grabbable placeObj, bool checkRoot = true) {
             return base.CanPlace(placeObj) && placeObj.body != localRigidbody;
         }
 

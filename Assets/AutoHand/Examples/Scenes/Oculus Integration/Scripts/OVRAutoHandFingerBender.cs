@@ -12,7 +12,16 @@ namespace Autohand.Demo{
         public float[] bendOffsets;
 
         bool pressed;
-        
+
+        private void OnDisable() {
+            if(controller == null)
+                return;
+
+            if(pressed)
+                for(int i = 0; i < controller.hand.fingers.Length; i++)
+                    controller.hand.fingers[i].bendOffset -= bendOffsets[i];
+        }
+
         void Update(){
             if(!pressed && Pressed()) {
                 pressed = true;

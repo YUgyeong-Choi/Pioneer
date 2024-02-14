@@ -150,28 +150,41 @@ namespace Autohand {
 
         public AutoHandPlayerEvent OnSnapTurn;
         public AutoHandPlayerEvent OnTeleported;
-        
-        
-        
-        float movementDeadzone = 0.1f;
-        float turnDeadzone = 0.4f;
+
+
+        [HideInInspector]
+        public float movementDeadzone = 0.1f;
+        [HideInInspector]
+        public float turnDeadzone = 0.4f;
 
 
         public const string HandPlayerLayer = "HandPlayer";
 
         public CapsuleCollider bodyCollider { get { return bodyCapsule; } }
 
-        public Rigidbody body { get; private set; }
+        public Rigidbody body { get; protected set; }
 
 
-        float turnResetzone = 0.3f;
-        float groundedOffset = 0.1f;
+        protected float turnResetzone = 0.3f;
+        protected float groundedOffset = 0.1f;
 
-        bool tempDisableGrounding = false;
-        HeadPhysicsFollower headPhysicsFollower;
-        CapsuleCollider bodyCapsule;
-        Vector3 moveDirection;
-        float turningAxis;
+        protected HeadPhysicsFollower headPhysicsFollower;
+        protected Vector3 moveDirection;
+        protected float turningAxis;
+
+        protected Vector3 climbAxis;
+        protected Dictionary<Hand, Climbable> climbing = new Dictionary<Hand, Climbable>();
+        protected Dictionary<Pushable, Hand> pushRight = new Dictionary<Pushable, Hand>();
+        protected Dictionary<Pushable, int> pushRightCount = new Dictionary<Pushable, int>();
+        protected Dictionary<Pushable, Hand> pushLeft = new Dictionary<Pushable, Hand>();
+        protected Dictionary<Pushable, int> pushLeftCount = new Dictionary<Pushable, int>();
+        protected Vector3 pushAxis;
+
+        protected CapsuleCollider bodyCapsule;
+        protected Hand lastRightHand;
+        protected Hand lastLeftHand;
+        protected Collider[] colliderNonAlloc = new Collider[50];
+
         bool isGrounded = false;
         bool axisReset = true;
         float playerHeight = 0;
@@ -179,22 +192,9 @@ namespace Autohand {
         float lastCrouchingHeight;
         Vector3 targetTrackedPos;
         Vector3 lastUpdatePosition;
+        bool tempDisableGrounding = false;
         bool editorSelected;
-
-        Hand lastRightHand;
-        Hand lastLeftHand;
-
-        Vector3 climbAxis;
-        Dictionary<Hand, Climbable> climbing = new Dictionary<Hand, Climbable>();
-        Dictionary<Pushable, Hand> pushRight = new Dictionary<Pushable, Hand>();
-        Dictionary<Pushable, int> pushRightCount = new Dictionary<Pushable, int>();
-        Dictionary<Pushable, Hand> pushLeft = new Dictionary<Pushable, Hand>();
-        Dictionary<Pushable, int> pushLeftCount = new Dictionary<Pushable, int>();
-        private Vector3 pushAxis;
-
         Vector3 lastPlatformPosition;
-
-
         Quaternion lastPlatformRotation;
         RaycastHit closestHit;
         Vector3 targetPosOffset;
@@ -399,7 +399,7 @@ namespace Autohand {
             turningAxis = turnAxis;
         }
 
-        private void LateUpdate() {
+        protected virtual void LateUpdate() {
             if(useMovement) {
                 UpdateTrackedObjects();
                 UpdateTurn(Time.deltaTime);
@@ -416,7 +416,6 @@ namespace Autohand {
                 UpdateRigidbody();
                 UpdatePlatform();
                 Ground();
-                UpdateTurn(Time.fixedDeltaTime);
             }
         }
 
@@ -504,26 +503,42 @@ namespace Autohand {
             var deltaHandPos = handRight.transform.position - startRightHandPos;
             if(pushRight.Count > 0)
                 handRight.transform.position -= deltaHandPos;
-            else if(handRight.body.SweepTest(deltaHandPos, out var hitRight, deltaHandPos.magnitude, QueryTriggerInteraction.Ignore)) {
-                if(handRight.holdingObj == null || (hitRight.rigidbody != handRight.holdingObj.body && !handRight.holdingObj.jointedBodies.Contains(hitRight.rigidbody)))
-                    if(handLeft.holdingObj == null || (hitRight.rigidbody != handLeft.holdingObj.body && !handLeft.holdingObj.jointedBodies.Contains(hitRight.rigidbody))) {
-                        handRight.transform.position -= deltaHandPos;
-                    }
-            }
+            else 
+               PreventHandClipping(handRight, startRightHandPos);
+            
+            
             deltaHandPos = handLeft.transform.position - startLeftHandPos;
             if(pushLeft.Count > 0)
                 handLeft.transform.position -= deltaHandPos;
-            else if(handLeft.body.SweepTest(deltaHandPos, out var hitLeft, deltaHandPos.magnitude, QueryTriggerInteraction.Ignore)) {
-                if(handRight.holdingObj == null || (hitLeft.rigidbody != handRight.holdingObj.body && !handRight.holdingObj.jointedBodies.Contains(hitLeft.rigidbody)))
-                    if(handLeft.holdingObj == null || (hitLeft.rigidbody != handLeft.holdingObj.body && !handLeft.holdingObj.jointedBodies.Contains(hitLeft.rigidbody))) { 
-                        handLeft.transform.position -= deltaHandPos;
-                    }
-            }
+            else 
+                PreventHandClipping(handLeft, startLeftHandPos);
+            
 
             lastUpdatePosition = transform.position;
 
         }
 
+        void PreventHandClipping(Hand hand, Vector3 startPosition) {
+            var deltaHandPos = hand.transform.position - startPosition;
+            if (deltaHandPos.magnitude < Physics.defaultContactOffset)
+                return;
+
+            var center = hand.handEncapsulationBox.transform.TransformPoint(hand.handEncapsulationBox.center) - deltaHandPos;
+            var halfExtents = hand.handEncapsulationBox.transform.TransformVector(hand.handEncapsulationBox.size) / 2f;
+            var hits = Physics.BoxCastAll(center, halfExtents, deltaHandPos, hand.handEncapsulationBox.transform.rotation, deltaHandPos.magnitude*1.5f, handPlayerMask);
+            for(int i = 0; i < hits.Length; i++) {
+                var hit = hits[i];
+                if(hit.collider.isTrigger)
+                    continue;
+
+                if(hand.holdingObj == null || hit.collider.attachedRigidbody == null || (hit.collider.attachedRigidbody != hand.holdingObj.body && !hand.holdingObj.jointedBodies.Contains(hit.collider.attachedRigidbody))) {
+                    var deltaHitPos = hit.point - hand.transform.position;
+                    hand.transform.position = Vector3.MoveTowards(hand.transform.position, startPosition, deltaHitPos.magnitude);
+                    break;
+                }
+
+            }
+        }
 
 
         void SyncBodyHead() {
@@ -586,16 +601,21 @@ namespace Autohand {
                     }
                     lastUpdatePosition = new Vector3(transform.position.x, lastUpdatePosition.y, transform.position.z);
 
+                    var handRightStartPos = handRight.transform.position;
+                    var handLeftStartPos = handLeft.transform.position;
+
                     trackingContainer.RotateAround(transform.position, Vector3.up, angle);
 
                     targetPosOffset = Vector3.zero;
                     targetTrackedPos = new Vector3(trackingContainer.position.x, targetTrackedPos.y, trackingContainer.position.z);
 
-
                     handRight.SetMoveTo();
                     handRight.SetHandLocation(handRight.moveTo.position, handRight.moveTo.rotation);
                     handLeft.SetMoveTo();
                     handLeft.SetHandLocation(handLeft.moveTo.position, handLeft.moveTo.rotation);
+
+                    PreventHandClipping(handRight, handRightStartPos);
+                    PreventHandClipping(handLeft, handLeftStartPos);
 
                     OnSnapTurn?.Invoke(this);
                     axisReset = false;
@@ -613,6 +633,7 @@ namespace Autohand {
                 lastUpdatePosition = new Vector3(transform.position.x, lastUpdatePosition.y, transform.position.z);
 
                 trackingContainer.RotateAround(transform.position, Vector3.up, smoothTurnSpeed * (Mathf.MoveTowards(turningAxis, 0, turnDeadzone)) * deltaTime);
+
 
                 targetPosOffset = Vector3.zero;
                 targetTrackedPos = new Vector3(trackingContainer.position.x, targetTrackedPos.y, trackingContainer.position.z);

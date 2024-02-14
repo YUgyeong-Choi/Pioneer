@@ -29,12 +29,14 @@ namespace Autohand {
         bool handTrackingActive = false;
         bool lastHandTrackingActive = false;
 
-        private void Start() {
+        private void Awake() {
+            handTrackingActive = OVRInput.IsControllerConnected(OVRInput.Controller.RHand) && OVRInput.IsControllerConnected(OVRInput.Controller.LHand);
             OnSwap(handTrackingActive);
+            lastHandTrackingActive = handTrackingActive;
         }
 
         private void FixedUpdate() {
-            handTrackingActive = OVRInput.IsControllerConnected(OVRInput.Controller.Hands);
+            handTrackingActive = OVRInput.IsControllerConnected(OVRInput.Controller.RHand) && OVRInput.IsControllerConnected(OVRInput.Controller.LHand);
             if(handTrackingActive != lastHandTrackingActive)
                 OnSwap(handTrackingActive);
 
@@ -68,9 +70,6 @@ namespace Autohand {
                 rightHand.follow = rightControllerTrackingFollow;
                 leftHand.follow = leftControllerTrackingFollow;
             }
-
-            rightHand.SetHandLocation(rightHand.follow.position, rightHand.follow.rotation);
-            leftHand.SetHandLocation(leftHand.follow.position, leftHand.follow.rotation);
         }
     }
 

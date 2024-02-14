@@ -70,17 +70,37 @@ namespace Autohand.Demo{
         Rigidbody body;
         CollisionDetectionMode mode;
 
-        void Start(){
+        void Start() {
+            hand.disableIK = true;
             skeleton = GetComponent<OVRSkeleton>();
             body = GetComponent<Rigidbody>();
             mode = body.collisionDetectionMode;
         }
 
         private void OnEnable() {
-            hand.disableIK = true; 
+            if(hand == null)
+                hand = GetComponent<Hand>();
+            if(body == null)
+                body = GetComponent<Rigidbody>();
+            if(skeleton == null)
+                skeleton = GetComponent<OVRSkeleton>();
+
+            hand.disableIK = true;
+            thumb.secondaryOffset = 0;
+            index.secondaryOffset = 0;
+            middle.secondaryOffset = 0;
+            ring.secondaryOffset = 0;
+            pinky.secondaryOffset = 0;
         }
 
         private void OnDisable() {
+            if(hand == null)
+                hand = GetComponent<Hand>();
+            if(body == null)
+                body = GetComponent<Rigidbody>();
+            if(skeleton == null)
+                skeleton = GetComponent<OVRSkeleton>();
+
             body.isKinematic = false;
             body.collisionDetectionMode = mode;
             hand.disableIK = false;

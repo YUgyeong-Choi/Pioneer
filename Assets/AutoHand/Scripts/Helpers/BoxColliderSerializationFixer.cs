@@ -45,7 +45,7 @@ public class BoxColliderSerializationFixer : MonoBehaviour
 
     [ContextMenu("Apply Colliders")]
     public void ApplyColliderSizesRecursive() {
-        //Debug.Log("Applying Collider Sizes: This is a fix to a Unity Error where box collider sizes are not saved properly when downloading a scene from Unity 2022 or higher on a project from 2021 or lower. ");
+        //Debug.Log("Applying Collider  Resizes: This is a fix to a Unity Error where box collider sizes are not saved properly when downloading a scene from Unity 2022 or higher on a project from 2021 or lower. ");
         foreach(var collider in colliderSizes) {
             if(collider.collider != null)
                 collider.collider.size = collider.size;

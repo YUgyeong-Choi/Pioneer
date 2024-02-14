@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Autohand;
 using UnityEngine;
 
 public class PaintballGun : MonoBehaviour
@@ -8,7 +10,16 @@ public class PaintballGun : MonoBehaviour
     [SerializeField] private float speed = 10.0f;
     [SerializeField] public GameObject paint;
 
-    public void DoThrow()
+    private Grabbable grabbable;
+
+    private void Awake()
+    {
+        grabbable = GetComponent<Grabbable>();
+
+        grabbable.onSqueeze.AddListener(Shoot);
+    }
+
+    public void Shoot(Hand hand, Grabbable grabbable)
     {
         if (paint != null)
         {

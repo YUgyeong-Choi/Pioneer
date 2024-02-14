@@ -46,7 +46,7 @@ namespace Autohand {
         internal Rigidbody body;
         Transform moveTo = null;
 
-        float startMass;
+        float startMass = 0;
         float startDrag;
         float startAngleDrag;
         float startHandMass;
@@ -58,17 +58,7 @@ namespace Autohand {
         public void Start() {
             if(body == null)
                 body = GetComponent<Rigidbody>();
-
-            if(startMass == 0) {
-                startMass = body.mass;
-                startDrag = body.drag;
-                startAngleDrag = body.angularDrag;
-                useGravity = body.useGravity;
-            }
         }
-
-
-
 
 
         public virtual void Set(Hand hand, Grabbable grab) {
@@ -91,8 +81,8 @@ namespace Autohand {
             tempTransform.rotation = hand.transform.rotation;
 
             var tempTransformChild = AutoHandExtensions.transformRulerChild;
-            tempTransformChild.position = grab.transform.position;
-            tempTransformChild.rotation = grab.transform.rotation;
+            tempTransformChild.position = grab.rootTransform.position;
+            tempTransformChild.rotation = grab.rootTransform.rotation;
 
             if(grab.maintainGrabOffset) {
                 tempTransform.position = hand.moveTo.position + hand.grabPositionOffset;
@@ -146,12 +136,13 @@ namespace Autohand {
             maxVelocity = grab.maxHeldVelocity;
             this.grab = grab;
 
-            hand.OnReleased += OnHandReleased;
+            hand.OnBeforeReleased += OnHandReleased;
         }
 
 
         void OnHandReleased(Hand hand, Grabbable grab){
-            RemoveFollow(hand, heldMoveTo[hand]);
+            if(heldMoveTo.ContainsKey(hand))
+                RemoveFollow(hand, heldMoveTo[hand]);
         }
 
         public virtual void FixedUpdate() {
@@ -204,17 +195,22 @@ namespace Autohand {
 
             void SetVelocity(float minVelocityChange) {
                 var velocityClamp = grab.maxHeldVelocity;
-
                 Vector3 vel = (movePos - transform.position).normalized * followPositionStrength * distance;
 
                 vel.x = Mathf.Clamp(vel.x, -velocityClamp, velocityClamp);
                 vel.y = Mathf.Clamp(vel.y, -velocityClamp, velocityClamp);
                 vel.z = Mathf.Clamp(vel.z, -velocityClamp, velocityClamp);
 
+                var deltaOffset = Time.fixedDeltaTime / 0.011111f;
+                var inverseDeltaOffset = 0.011111f / Time.fixedDeltaTime;
+                body.drag = startDrag * inverseDeltaOffset;
+                var maxDelta = deltaOffset;
+                minVelocityChange *= deltaOffset;
+
                 body.velocity = new Vector3(
-                    Mathf.MoveTowards(body.velocity.x, vel.x, minVelocityChange + Mathf.Abs(body.velocity.x) * Time.fixedDeltaTime * 60),
-                    Mathf.MoveTowards(body.velocity.y, vel.y, minVelocityChange + Mathf.Abs(body.velocity.y) * Time.fixedDeltaTime * 60),
-                    Mathf.MoveTowards(body.velocity.z, vel.z, minVelocityChange + Mathf.Abs(body.velocity.z) * Time.fixedDeltaTime * 60)
+                    Mathf.MoveTowards(body.velocity.x, vel.x, minVelocityChange + Mathf.Abs(body.velocity.x) * maxDelta),
+                    Mathf.MoveTowards(body.velocity.y, vel.y, minVelocityChange + Mathf.Abs(body.velocity.y) * maxDelta),
+                    Mathf.MoveTowards(body.velocity.z, vel.z, minVelocityChange + Mathf.Abs(body.velocity.z) * maxDelta)
                 );
             }
         }
@@ -236,15 +232,19 @@ namespace Autohand {
             Vector3 angular = multiLinear * axis.normalized;
             angle = Mathf.Abs(angle);
 
-            var angleStrengthOffset = 1;// Mathf.Lerp(1f, 2f, angle / 180f);
-            body.angularDrag = Mathf.Lerp(startAngleDrag + 5, startAngleDrag, angle/4f);
+            var angleStrengthOffset = Mathf.Lerp(1f, 1.5f, angle/16f);
+            var deltaOffset = Time.fixedDeltaTime / 0.011111f;
+            var inverseDeltaOffset = 0.011111f / Time.fixedDeltaTime;
+            body.angularDrag = Mathf.Lerp((startAngleDrag * 1.2f), startAngleDrag, angle/4f) * inverseDeltaOffset;
+            var maxDelta = followRotationStrength * 50f * angleStrengthOffset;
 
 
             body.angularVelocity = new Vector3(
-                Mathf.MoveTowards(body.angularVelocity.x, angular.x, Mathf.Clamp(Mathf.Sqrt(Mathf.Abs(body.angularVelocity.x))/180f, 1, 4) *followRotationStrength * Time.fixedDeltaTime * 10 * angleStrengthOffset),
-                Mathf.MoveTowards(body.angularVelocity.y, angular.y, Mathf.Clamp(Mathf.Sqrt(Mathf.Abs(body.angularVelocity.y))/180f, 1, 4) *followRotationStrength * Time.fixedDeltaTime * 10 * angleStrengthOffset),
-                Mathf.MoveTowards(body.angularVelocity.z, angular.z, Mathf.Clamp(Mathf.Sqrt(Mathf.Abs(body.angularVelocity.z))/180f, 1, 4) *followRotationStrength * Time.fixedDeltaTime * 10 * angleStrengthOffset)
+                Mathf.MoveTowards(body.angularVelocity.x, angular.x, maxDelta),
+                Mathf.MoveTowards(body.angularVelocity.y, angular.y, maxDelta),
+                Mathf.MoveTowards(body.angularVelocity.z, angular.z, maxDelta)
             );
+
         }
 
 
