@@ -8,18 +8,22 @@ using UnityEngine.SceneManagement;
 public class RoomData
 {
     public string roomName;
+    public string roomType;
+    public string roomSize;
     public string currentTime;
 }
 
 public class RoomDataManager : MonoBehaviour
 {
     public TextMeshProUGUI reconfirmTitle;
+    public TextMeshProUGUI roomType;
+    public TextMeshProUGUI roomSize;
 
     public RoomData roomData = new RoomData();
     
     //Debug.Log("Persistent Data Path: " + Application.persistentDataPath);
     private string _path;
-    private int _roomIndex;
+    private int _roomIndex=99;
 
     void Start()
     {
@@ -56,6 +60,8 @@ public class RoomDataManager : MonoBehaviour
         if (File.Exists(_path))
         {
             roomData.roomName = reconfirmTitle.text;
+            roomData.roomType = roomType.text;
+            roomData.roomSize = roomSize.text;
             roomData.currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             using (StreamWriter writer = File.AppendText(_path))
             {
@@ -66,10 +72,13 @@ public class RoomDataManager : MonoBehaviour
         else // 파일 생성 및 추가
         {
             roomData.roomName = reconfirmTitle.text;
+            roomData.roomType = roomType.text;
+            roomData.roomSize = roomSize.text;
             roomData.currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             string data = JsonUtility.ToJson(roomData);
-            File.WriteAllText(_path, data);
+            File.WriteAllText(_path, data + "\n");
+            
         }
         
         // RoomsScene에 정보 전달
@@ -94,7 +103,8 @@ public class RoomDataManager : MonoBehaviour
         {
             Debug.LogError("'Player' 태그가 지정된 GameObject를 찾을 수 없습니다.");
         }
-
+        
         SceneManager.LoadScene(1);
+
     }
 }

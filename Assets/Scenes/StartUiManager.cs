@@ -16,9 +16,16 @@ public class StartUIManager : MonoBehaviour
     public GameObject roomPanel;
     public TextMeshProUGUI addRoomText;
     public TextMeshProUGUI changeRoomNameText;
+    public GameObject player;
+    public GameObject roomSelectPage;
+    public TextMeshProUGUI roomSizeText;
+    public TextMeshProUGUI roomTypeText;
 
     private string _path;
     private List<RoomData> _roomDataList;
+    private RoomDataClass[] _cubeInfo;
+    private RoomDataClass[] _cylinderInfo;
+    private int _roomTypeIndex = 1;
 
     // 버튼의 text에 roomName 할당
     void Start()
@@ -26,8 +33,6 @@ public class StartUIManager : MonoBehaviour
         //Debug.Log("Persistent Data Path: " + Application.persistentDataPath);
         _path = Path.Combine(Application.persistentDataPath, "RoomData.json");
         _roomDataList = ReadRoomDataFromFile();
-
-        //Debug.Log(roomDataList.Count);
 
         for (int i = 0; i < _roomDataList.Count; i++)
         {
@@ -52,6 +57,20 @@ public class StartUIManager : MonoBehaviour
                 Debug.LogError(roomName + " not found in RoomPanel");
             }
         }
+        
+        _cubeInfo = new RoomDataClass[]
+        {
+            new RoomDataClass("Cube", "small", new Vector3(20f, 1f, 0f)),
+            new RoomDataClass("Cube", "middle", new Vector3(40f, 1f, 0f)),
+            new RoomDataClass("Cube", "large", new Vector3(60f, 1f, 0f))
+        };
+
+        _cylinderInfo = new RoomDataClass[]
+        {
+            new RoomDataClass("Cylinder", "small", new Vector3(20f, 1f, 20f)),
+            new RoomDataClass("Cylinder", "middle", new Vector3(40f, 1f, 20f)),
+            new RoomDataClass("Cylinder", "large", new Vector3(60f, 1f, 20f))
+        };
     }
 
     // json 불러와서 List 형태로
@@ -172,4 +191,70 @@ public class StartUIManager : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         addRoomText.gameObject.SetActive(false);
     }
+
+    // 방 모양 선택
+    public void RoomTypeButton(Button clickedButton)
+    {
+        _roomTypeIndex = 1;
+        TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI>();
+        
+        if (buttonText.text == "Cube")
+        {
+            roomSelectPage.SetActive(true);
+            roomTypeText.text = "Cube";
+            roomSizeText.text = _cubeInfo[_roomTypeIndex].roomSize;
+            player.transform.position = _cubeInfo[_roomTypeIndex].position;
+        }else if(buttonText.text == "Cylinder")
+        {
+            roomSelectPage.SetActive(true);
+            roomTypeText.text = "Cylinder";
+            roomSizeText.text = _cylinderInfo[_roomTypeIndex].roomSize;
+            player.transform.position = _cylinderInfo[_roomTypeIndex].position;
+        }
+    }
+
+    // 방 사이즈 이동
+    public void MoveRoomType(Button clickedButton)
+    {
+        RoomDataClass[] roomInfoArray = null;
+
+        if (roomTypeText.text == "Cube")
+        {
+            roomInfoArray = _cubeInfo;
+        }
+        else if (roomTypeText.text == "Cylinder")
+        {
+            roomInfoArray = _cylinderInfo;
+        }
+
+        if (roomInfoArray != null)
+        {
+            if (clickedButton.gameObject.name == "Icon Prev")
+            {
+                _roomTypeIndex--;
+                if (_roomTypeIndex < 0)
+                {
+                    _roomTypeIndex = roomInfoArray.Length - 1;
+                }
+            }
+            else if (clickedButton.gameObject.name == "Icon Next")
+            {
+                _roomTypeIndex++;
+                if (_roomTypeIndex >= roomInfoArray.Length)
+                {
+                    _roomTypeIndex = 0;
+                }
+            }
+
+            roomSizeText.text = roomInfoArray[_roomTypeIndex].roomSize;
+            player.transform.position = roomInfoArray[_roomTypeIndex].position;
+        }
+    }
+
+    public void BackSelectPage()
+    {
+        roomSelectPage.SetActive(false);
+        player.transform.position = new Vector3(0, 1, -1.5f);
+    }
 }
+

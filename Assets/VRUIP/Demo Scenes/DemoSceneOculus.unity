@@ -6125,6 +6125,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1626713180}
     m_Modifications:
+    - target: {fileID: 5490499136242079588, guid: 1caab6790b5e6154fa43dcde845f668f, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5490499136242079590, guid: 1caab6790b5e6154fa43dcde845f668f, type: 3}
       propertyPath: m_Name
       value: Login Template
