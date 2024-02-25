@@ -45,13 +45,13 @@ public class RoomsManager : MonoBehaviour
                 newRoom = Instantiate(largeCube, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0)); 
                 break;
             case "smallCylinder": 
-                newRoom = Instantiate(smallCylinder, new Vector3(0, 1, 0), Quaternion.identity); 
+                newRoom = Instantiate(smallCylinder, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0));
                 break;
             case "middleCylinder": 
-                newRoom = Instantiate(middleCylinder, new Vector3(0, 1, 0), Quaternion.identity); 
+                newRoom = Instantiate(middleCylinder, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0)); 
                 break;
             case "largeCylinder": 
-                newRoom = Instantiate(largeCylinder, new Vector3(0, 1, 0), Quaternion.identity); 
+                newRoom = Instantiate(largeCylinder, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0));
                 break;
             default: 
                 Debug.LogError("Invalid room type"); 
@@ -59,7 +59,6 @@ public class RoomsManager : MonoBehaviour
         }
         
         newRoom.transform.SetParent(roomsCollection);
-        
     }
     
     List<RoomData> ReadRoomDataFromFile()

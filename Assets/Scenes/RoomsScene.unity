@@ -853,9 +853,9 @@ MonoBehaviour:
   smallCube: {fileID: 919132149155446097, guid: 70e9a65857dcdc0458937698a9eab1aa, type: 3}
   middleCube: {fileID: 919132149155446097, guid: e179c4697d0f3374980e531da0bdca60, type: 3}
   largeCube: {fileID: 919132149155446097, guid: f21bd86acab8cee4793f1ea5312dc836, type: 3}
-  smallCylinder: {fileID: 919132149155446097, guid: 028a2c895571ae547a9bb748b2473634, type: 3}
-  middleCylinder: {fileID: 919132149155446097, guid: f27191085b5fb4e44b7ff004c365b1c1, type: 3}
-  largeCylinder: {fileID: 919132149155446097, guid: 8164feb8fbf60464babdf2e360a046c6, type: 3}
+  smallCylinder: {fileID: 919132149155446097, guid: 70e9a65857dcdc0458937698a9eab1aa, type: 3}
+  middleCylinder: {fileID: 919132149155446097, guid: 08e9270728cbbb144852037fe779945f, type: 3}
+  largeCylinder: {fileID: 919132149155446097, guid: f9888ba4019d3c843b00537079e4cc0f, type: 3}
 --- !u!224 &974202738 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 905653798956434481, guid: 26f2e64900c53ae4e859b89a85e5ea0b, type: 3}
