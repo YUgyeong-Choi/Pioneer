@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
+using PaintCore;
+using PaintIn3D;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,6 +23,13 @@ public class RoomsManager : MonoBehaviour
     private string _roomDataPath;
     private List<RoomData> roomDataList = new List<RoomData>();
 
+    public Mesh paintCubeMesh;
+    public Mesh paintSmallCylinderMesh;
+    public Mesh paintMidleCylinderMesh;
+    public Mesh paintLargeCylinderMesh;
+
+    private CwPaintableMeshTexture meshTexture = null;
+
     void Start()
     {
         _roomDataPath = Path.Combine(Application.persistentDataPath, "RoomData.json");
@@ -37,21 +46,27 @@ public class RoomsManager : MonoBehaviour
         { 
             case "smallCube": 
                 newRoom = Instantiate(smallCube, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0));
+                newRoom.GetComponent<MeshFilter>().mesh = paintCubeMesh;
                 break;
             case "middleCube": 
                 newRoom = Instantiate(middleCube, new Vector3(0, 1, 0),Quaternion.Euler(90, 0, 0));
+                newRoom.GetComponent<MeshFilter>().mesh = paintCubeMesh;
                 break;
             case "largeCube":
                 newRoom = Instantiate(largeCube, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0)); 
+                newRoom.GetComponent<MeshFilter>().mesh = paintCubeMesh;
                 break;
             case "smallCylinder": 
                 newRoom = Instantiate(smallCylinder, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0));
+                newRoom.GetComponent<MeshFilter>().mesh = paintSmallCylinderMesh;
                 break;
             case "middleCylinder": 
                 newRoom = Instantiate(middleCylinder, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0)); 
+                newRoom.GetComponent<MeshFilter>().mesh = paintMidleCylinderMesh;
                 break;
             case "largeCylinder": 
                 newRoom = Instantiate(largeCylinder, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0));
+                newRoom.GetComponent<MeshFilter>().mesh = paintLargeCylinderMesh;
                 break;
             default: 
                 Debug.LogError("Invalid room type"); 
@@ -59,6 +74,12 @@ public class RoomsManager : MonoBehaviour
         }
         
         newRoom.transform.SetParent(roomsCollection);
+        CwPaintableMesh mesh = newRoom.AddComponent<CwPaintableMesh>();
+        mesh.Activation = CwPaintableMesh.ActivationType.Awake;
+        meshTexture = newRoom.AddComponent<CwPaintableMeshTexture>();
+        meshTexture.Slot = new CwSlot(0, "_BaseMap");
+        meshTexture.Width = 13000;
+        meshTexture.Height = 13000;
     }
     
     List<RoomData> ReadRoomDataFromFile()
@@ -86,6 +107,7 @@ public class RoomsManager : MonoBehaviour
 
     public void ExitButton()
     {
+        meshTexture.GetPngData();
         Application.Quit();
     }
 }
