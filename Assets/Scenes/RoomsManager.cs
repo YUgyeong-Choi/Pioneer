@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using PaintCore;
 using PaintIn3D;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class RoomsManager : MonoBehaviour
 {
-    public Transform roomsCollection;
     DontDestroyOnLoad dontDestroyObject;
 
     public GameObject smallCube;
@@ -23,6 +24,7 @@ public class RoomsManager : MonoBehaviour
     private string _roomDataPath;
     private string _roomMeshPath;
     private List<RoomData> roomDataList = new List<RoomData>();
+    private List<byte[]> roomMeshList = new List<byte[]>();
 
     private CwPaintableMeshTexture meshTexture = null;
 
@@ -32,9 +34,10 @@ public class RoomsManager : MonoBehaviour
         _roomMeshPath = Path.Combine(Application.persistentDataPath, "RoomMesh.json");
         dontDestroyObject = FindObjectOfType<DontDestroyOnLoad>();
         roomDataList = ReadRoomDataFromFile();
-        roomIndex = dontDestroyObject.roomIndex;
+        roomMeshList = ReadRoomMeshDataFromFile();
         
-        // 예외가 발생하면 인덱스가 올바르지 않음을 의미하므로 새로운 방을 생성하고 추가합니다.
+        // 초기 방 생성
+        roomIndex = dontDestroyObject.roomIndex;
         string roomType = roomDataList[roomIndex].roomType;
         string roomSize = roomDataList[roomIndex].roomSize;
         string roomTypeName = roomSize + roomType;
@@ -64,6 +67,18 @@ public class RoomsManager : MonoBehaviour
                 break;
         }
         
+        // 방 데이터 있으면 불러오기
+        Debug.Log("roomCount: " + roomMeshList.Count);
+        if (roomMeshList.Count > roomIndex)
+        {
+            CwPaintableMeshTexture mesh = newRoom.GetComponent<CwPaintableMeshTexture>();
+            mesh.LoadFromData(roomMeshList[roomIndex]);
+        }
+        else
+        {
+            //아직 방에 대한 데이터 없음
+            return;
+        }
     }
     
     List<RoomData> ReadRoomDataFromFile()
@@ -89,30 +104,69 @@ public class RoomsManager : MonoBehaviour
         return roomDataList;
     }
 
-    public void ExitButton()
+    List<byte[]> ReadRoomMeshDataFromFile()
     {
-        byte[] imageData = meshTexture.GetPngData(true);
-
+        List<byte[]> roomMeshDataList = new List<byte[]>();
+        
         if (File.Exists(_roomMeshPath))
         {
             string[] lines = File.ReadAllLines(_roomMeshPath);
 
-            for (int i = 0; i < lines.Length; i++)
+            foreach (string line in lines)
             {
-                if (i == roomIndex)
+                string[] byteValues = line.Split('-');
+                byte[] imageData = new byte[byteValues.Length];
+                for (int i = 0; i < byteValues.Length; i++)
                 {
-                    string data = JsonUtility.ToJson(imageData);
-                    lines[i] = data + "\n";
-                    break; 
+                    imageData[i] = Convert.ToByte(byteValues[i], 16);
                 }
+                
+                roomMeshDataList.Add(imageData);
             }
-
-            File.WriteAllLines(_roomMeshPath, lines);
         }
         else
         {
-            string data = JsonUtility.ToJson(imageData);
-            File.WriteAllText(_roomMeshPath, data + "\n");
+            Debug.Log("File not found: " + _roomMeshPath);
+        }
+        
+        return roomMeshDataList;
+    }
+
+    public void ExitButton()
+    {
+        CwPaintableMeshTexture mesh = newRoom.GetComponent<CwPaintableMeshTexture>();
+        byte[] imageData = mesh.GetPngData();
+
+        if (File.Exists(_roomMeshPath))
+        {
+            // room 내용 변경
+            if (roomMeshList.Count > roomIndex)
+            {
+                string roomMeshs = null;
+                roomMeshList[roomIndex] = imageData;
+                foreach (byte[] roomMesh in roomMeshList)
+                {
+                    string byteString = BitConverter.ToString(roomMesh);
+                    roomMeshs += byteString + "\n";
+                }
+                                            
+                File.WriteAllText(_roomMeshPath, roomMeshs);
+            }
+            else //새로운 room 추가
+            {
+                
+                using (StreamWriter writer = File.AppendText(_roomMeshPath))
+                {
+                    string byteString = BitConverter.ToString(imageData);
+                    writer.WriteLine(byteString);
+                }
+            }
+            
+        }
+        else
+        {
+            string byteString = BitConverter.ToString(imageData);
+            File.WriteAllText(_roomMeshPath, byteString + "\n");
         }
         Application.Quit();
     }
