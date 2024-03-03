@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using PaintCore;
+using System.Collections.Generic;
 
 namespace PaintIn3D
 {
@@ -11,18 +12,27 @@ namespace PaintIn3D
 	{
 		[System.NonSerialized]
 		private CwPaintableMesh parent;
-
+		
+		[SerializeField]
+		private List<Renderer> otherRenderers = new List<Renderer>();
+		
 		protected override void ApplyTexture(Texture texture)
 		{
+			Debug.Log("parent: "+ parent);
 			if (parent == null)
 			{
 				parent = GetComponentInParent<CwPaintableMesh>();
+				if (parent == null)
+				{
+					Debug.Log("CwPaintableMesh 컴포넌트를 찾지 못했습니다.");
+					return; 
+				}
 			}
 
 			if (parent != null)
 			{
 				parent.ApplyTexture(Slot, texture);
-
+				Debug.Log("parent OhterRenderers: "+ parent + " ㅇㅇㅇ "+ parent.OtherRenderers);
 				foreach (var otherRenderer in parent.OtherRenderers)
 				{
 					if (otherRenderer != null)

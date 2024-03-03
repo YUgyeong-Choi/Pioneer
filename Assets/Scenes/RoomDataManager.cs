@@ -21,12 +21,12 @@ public class RoomDataManager : MonoBehaviour
 
     public RoomData roomData = new RoomData();
     
-    //Debug.Log("Persistent Data Path: " + Application.persistentDataPath);
     private string _path;
     private int _roomIndex=99;
 
     void Start()
     {
+        Debug.Log("Persistent Data Path: " + Application.persistentDataPath);
         _path = Path.Combine(Application.persistentDataPath, "RoomData.json");
         _roomIndex = ReadRoomDataFromFile();
     }
