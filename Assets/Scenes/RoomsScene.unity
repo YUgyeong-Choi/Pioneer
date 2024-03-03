@@ -1437,7 +1437,7 @@ GameObject:
   - component: {fileID: 950944907}
   - component: {fileID: 950944908}
   m_Layer: 0
-  m_Name: RoomsParent
+  m_Name: RoomManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1471,16 +1471,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomsCollection: {fileID: 950944907}
-  smallCube: {fileID: 919132149155446097, guid: 70e9a65857dcdc0458937698a9eab1aa, type: 3}
-  middleCube: {fileID: 919132149155446097, guid: e179c4697d0f3374980e531da0bdca60, type: 3}
-  largeCube: {fileID: 919132149155446097, guid: f21bd86acab8cee4793f1ea5312dc836, type: 3}
-  smallCylinder: {fileID: 919132149155446097, guid: 08e9270728cbbb144852037fe779945f, type: 3}
-  middleCylinder: {fileID: 919132149155446097, guid: 197c49e9e5bf9b149a14bf2b8940b43d, type: 3}
-  largeCylinder: {fileID: 919132149155446097, guid: f9888ba4019d3c843b00537079e4cc0f, type: 3}
-  paintCubeMesh: {fileID: -4208966822982178529, guid: 394ae45f39b04a94ba9705fbfb24902d, type: 2}
-  paintSmallCylinderMesh: {fileID: -7648063244600737845, guid: f7c06318293cf11469f73f9e7abfc395, type: 2}
-  paintMidleCylinderMesh: {fileID: 440725525545165915, guid: 8f5d17056780e4e43bc9603d76676818, type: 2}
-  paintLargeCylinderMesh: {fileID: 8839471776775505578, guid: c0f6ae75924da5e449008b073c167d77, type: 2}
+  smallCube: {fileID: 5302692451649006931, guid: 50dd2f6fead2540408de8c64de79792c, type: 3}
+  middleCube: {fileID: 5627283448778299372, guid: 781bf8791365a4249a26e65a24f8cc6d, type: 3}
+  largeCube: {fileID: 1651609591959293317, guid: 08e1d0f816dbfe541be1bac94343d594, type: 3}
+  smallCylinder: {fileID: 4203548525013247669, guid: d9fd290ed0d046d48b606cfbf5b04f38, type: 3}
+  middleCylinder: {fileID: 2215360418468238534, guid: eb75e3e417cc0be4782cdd661e9b2578, type: 3}
+  largeCylinder: {fileID: 690031231365381339, guid: 2a79fe7c039697842ac4fbb637050627, type: 3}
 --- !u!224 &974202738 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 905653798956434481, guid: 26f2e64900c53ae4e859b89a85e5ea0b, type: 3}
@@ -1898,7 +1894,6 @@ MonoBehaviour:
   activated: 0
   current: {fileID: 0}
   preview: {fileID: 0}
-  otherRenderers: []
 --- !u!114 &1258783086
 MonoBehaviour:
   m_ObjectHideFlags: 0

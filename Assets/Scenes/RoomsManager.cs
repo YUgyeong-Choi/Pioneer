@@ -24,11 +24,6 @@ public class RoomsManager : MonoBehaviour
     private string _roomMeshPath;
     private List<RoomData> roomDataList = new List<RoomData>();
 
-    public Mesh paintCubeMesh;
-    public Mesh paintSmallCylinderMesh;
-    public Mesh paintMidleCylinderMesh;
-    public Mesh paintLargeCylinderMesh;
-
     private CwPaintableMeshTexture meshTexture = null;
 
     void Start()
@@ -48,36 +43,27 @@ public class RoomsManager : MonoBehaviour
         { 
             case "smallCube": 
                 newRoom = Instantiate(smallCube, new Vector3(0, 0, 0), Quaternion.Euler(90, 0, 0));
-                newRoom.GetComponent<MeshFilter>().mesh = paintCubeMesh;
                 break;
             case "middleCube": 
                 newRoom = Instantiate(middleCube, new Vector3(0, 0, 0),Quaternion.Euler(90, 0, 0));
-                newRoom.GetComponent<MeshFilter>().mesh = paintCubeMesh;
                 break;
             case "largeCube":
                 newRoom = Instantiate(largeCube, new Vector3(0, 0, 0), Quaternion.Euler(90, 0, 0)); 
-                newRoom.GetComponent<MeshFilter>().mesh = paintCubeMesh;
                 break;
             case "smallCylinder": 
                 newRoom = Instantiate(smallCylinder, new Vector3(0, 2, 0), Quaternion.Euler(90, 0, 0));
-                newRoom.GetComponent<MeshFilter>().mesh = paintSmallCylinderMesh;
                 break;
             case "middleCylinder": 
                 newRoom = Instantiate(middleCylinder, new Vector3(0, 02, 0), Quaternion.Euler(90, 0, 0)); 
-                newRoom.GetComponent<MeshFilter>().mesh = paintMidleCylinderMesh;
                 break;
             case "largeCylinder": 
                 newRoom = Instantiate(largeCylinder, new Vector3(0, 02, 0), Quaternion.Euler(90, 0, 0));
-                newRoom.GetComponent<MeshFilter>().mesh = paintLargeCylinderMesh;
                 break;
             default: 
                 Debug.LogError("Invalid room type"); 
                 break;
         }
         
-        CwPaintableMesh mesh = newRoom.AddComponent<CwPaintableMesh>();
-        CwPaintableMeshTexture meshTexture = newRoom.AddComponent<CwPaintableMeshTexture>();
-        meshTexture.Slot = new CwSlot(0, "_BaseMap");
     }
     
     List<RoomData> ReadRoomDataFromFile()
