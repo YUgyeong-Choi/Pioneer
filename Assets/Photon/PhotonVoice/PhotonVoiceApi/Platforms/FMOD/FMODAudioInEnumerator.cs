@@ -22,7 +22,7 @@ namespace Photon.Voice.FMOD
             if (res != FMODLib.RESULT.OK)
             {
                 Error = "failed to getRecordNumDrivers: " + res;
-                logger.LogError(LOG_PREFIX + Error);
+                logger.Log(LogLevel.Error, LOG_PREFIX + Error);
                 return;
             }
 
@@ -33,7 +33,7 @@ namespace Photon.Voice.FMOD
                 if (res != FMODLib.RESULT.OK)
                 {
                     Error = "failed to getRecordDriverInfo: " + res;
-                    logger.LogError(LOG_PREFIX + Error);
+                    logger.Log(LogLevel.Error, LOG_PREFIX + Error);
                     return;
                 }
                 devices.Add(new DeviceInfo(id, name));

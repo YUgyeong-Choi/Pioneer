@@ -35,7 +35,7 @@ namespace Photon.Voice
     /// All standard LoadBalancing features are available.
     /// Use <see cref="VoiceClient"/> to work with media streams.
     /// </remarks>
-    public class LoadBalancingTransport : LoadBalancingClient, IVoiceTransport, ILogger, IDisposable
+    public class LoadBalancingTransport : LoadBalancingClient, IVoiceTransport, IDisposable
     {
         // Channel is used only by local voice (to specify Enet channel) and ignored by remote voices which are all on the same channel.
         // Join / leave per channel is not supported.
@@ -48,7 +48,7 @@ namespace Photon.Voice
             int overhead = 3 * 2; // possible InterestGroup and Receivers: key, type, value
             if (par.TargetPlayers != null)
             {
-                overhead += 3 + par.TargetPlayers.Length; // key, type, compressed ength and array
+                overhead += 3 + par.TargetPlayers.Length; // key, type, compressed length and array
             }
 
             return 1114 - overhead; // <- protocol 18 theoretical encoded; experimental encrypted: 1115, non-encrypted: 1130
@@ -60,11 +60,7 @@ namespace Photon.Voice
         protected VoiceClient voiceClient;
         private PhotonTransportProtocol protocol;
         protected readonly bool cppCompatibilityMode;
-
-        public void LogError(string fmt, params object[] args) { this.DebugReturn(DebugLevel.ERROR, string.Format(fmt, args)); }
-        public void LogWarning(string fmt, params object[] args) { this.DebugReturn(DebugLevel.WARNING, string.Format(fmt, args)); }
-        public void LogInfo(string fmt, params object[] args) { this.DebugReturn(DebugLevel.INFO, string.Format(fmt, args)); }
-        public void LogDebug(string fmt, params object[] args) { this.DebugReturn(DebugLevel.ALL, string.Format(fmt, args)); }
+        protected readonly ILogger logger;
 
         public bool IsChannelJoined(int channelId) { return this.State == ClientState.Joined; }
 
@@ -76,11 +72,11 @@ namespace Photon.Voice
         /// <param name="cppCompatibilityMode">Use a protocol compatible with Voice C++ API.</param>
         public LoadBalancingTransport(ILogger logger = null, ConnectionProtocol connectionProtocol = ConnectionProtocol.Udp, bool cppCompatibilityMode = false) : base(connectionProtocol)
         {
-            this.ClientType = ClientAppType.Voice;
             if (logger == null)
             {
-                logger = this;
+                logger = new LBCLogger(this);
             }
+            this.ClientType = ClientAppType.Voice;
             this.cppCompatibilityMode = cppCompatibilityMode;
             base.EventReceived += onEventActionVoiceClient;
             base.StateChanged += onStateChangeVoiceClient;
@@ -91,6 +87,7 @@ namespace Photon.Voice
                 this.LoadBalancingPeer.ChannelCount = 4;
             }
             this.protocol = new PhotonTransportProtocol(voiceClient, logger);
+            this.logger = logger;
         }
 
         /// <summary>
@@ -273,5 +270,39 @@ namespace Photon.Voice
         {
             this.voiceClient.Dispose();
         }
+
+        // Allows the underlying LoadBalancingClient.DebugReturn() logger to be used as a Transport/Voice logger.
+        class LBCLogger : ILogger
+        {
+            LoadBalancingTransport lbt;
+            public LBCLogger(LoadBalancingTransport lbt)
+            {
+                this.lbt = lbt;
+            }
+
+            public LogLevel Level
+            {
+                get
+                {
+                    if (lbt.LoadBalancingPeer.DebugOut == DebugLevel.INFO) return LogLevel.Info;
+                    if (lbt.LoadBalancingPeer.DebugOut == DebugLevel.WARNING) return LogLevel.Warning;
+                    if (lbt.LoadBalancingPeer.DebugOut <= DebugLevel.ERROR) return LogLevel.Error;
+                    return LogLevel.Trace;
+                }
+            }
+
+            public void Log(LogLevel level, string fmt, params object[] args)
+            {
+                if (this.Level >= level)
+                {
+                    DebugLevel debugOut = DebugLevel.ALL;
+                    if (level == LogLevel.Info) debugOut = DebugLevel.INFO;
+                    else if (level == LogLevel.Warning) debugOut = DebugLevel.WARNING;
+                    else if (level == LogLevel.Error) debugOut = DebugLevel.ERROR;
+                    lbt.DebugReturn(debugOut, string.Format(fmt, args));
+                }
+            }
+        }
+
     }
 }

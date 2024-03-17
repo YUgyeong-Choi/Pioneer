@@ -1,10 +1,14 @@
 {
   "dependencies": {
+    "com.meta.xr.sdk.all": "60.0.0",
+    "com.meta.xr.sdk.avatars": "24.1.1",
+    "com.meta.xr.sdk.avatars.sample.assets": "24.1.1",
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.feature.development": "1.0.1",
     "com.unity.feature.vr": "1.0.0",
     "com.unity.learn.iet-framework": "3.1.3",
+    "com.unity.nuget.mono-cecil": "1.11.4",
     "com.unity.render-pipelines.universal": "14.0.9",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.6",

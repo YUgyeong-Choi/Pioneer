@@ -96,7 +96,7 @@ namespace Photon.Voice
                         this.onVoiceRemove(channelId, playerId, content[2]);
                         break;
                     default:
-                        logger.LogError("[PV] Unknown sevent subcode " + content[1]);
+                        logger.Log(LogLevel.Error, "[PV] Unknown sevent subcode " + content[1]);
                         break;
                 }
             }

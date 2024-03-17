@@ -18,7 +18,7 @@ namespace VRUIP
         public Camera mainCamera;
         public LineRenderer lineRenderer;
 #if OCULUS_INTEGRATION
-        public LaserPointer laserPointer;
+        //public LaserPointer laserPointer;
         public OVRGrabber leftHand;
         public OVRGrabber rightHand;
         #endif
@@ -61,7 +61,7 @@ namespace VRUIP
         private void Start()
         {
 #if OCULUS_INTEGRATION
-            laserPointer.laserBeamBehavior = LaserPointer.LaserBeamBehavior.OnWhenHitTarget;
+            //laserPointer.laserBeamBehavior = LaserPointer.LaserBeamBehavior.OnWhenHitTarget;
 #endif
         }
 

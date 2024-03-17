@@ -11,14 +11,13 @@
 
 namespace Photon.Voice.Unity
 {
-    using ExitGames.Client.Photon;
     using UnityEngine;
 
     [AddComponentMenu("Photon Voice/Voice Logger")]
     [DisallowMultipleComponent]
     public class VoiceLogger : MonoBehaviour
     {
-        public DebugLevel LogLevel = DebugLevel.WARNING;
+        public LogLevel LogLevel = LogLevel.Warning;
 
         // required for the MonoBehaviour to have the 'enabled' checkbox
         private void Start()
@@ -45,7 +44,7 @@ namespace Photon.Voice.Unity
                 {
                     if (vlRoot != null)
                     {
-                        UnityLogger.Log(DebugLevel.INFO, vl, "LOGGER", vlRoot.name, "Disabling VoiceLogger duplicates at the scene root.");
+                        UnityLogger.Log(LogLevel.Info, vl, "LOGGER", vlRoot.name, "Disabling VoiceLogger duplicates at the scene root.");
                         vl.enabled = false;
                     }
                     else
@@ -75,14 +74,14 @@ namespace Photon.Voice.Unity
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(vl.gameObject.scene);
             }
 
-            vl.LogLevel = (DebugLevel)UnityEditor.EditorGUILayout.EnumPopup("Log Level", vl.LogLevel);
+            vl.LogLevel = (LogLevel)UnityEditor.EditorGUILayout.EnumPopup("Log Level", vl.LogLevel);
         }
 #endif
     }
 
     public static class UnityLogger
     {
-        public static void Log(DebugLevel level, Object obj, string tag, string objName, string fmt, params object[] args)
+        public static void Log(LogLevel level, Object obj, string tag, string objName, string fmt, params object[] args)
         {
             // obj.name is available only on the main thread, so we pass objName here
             fmt = GetFormatString(level, tag, objName, fmt);
@@ -90,24 +89,22 @@ namespace Photon.Voice.Unity
             {
                 switch (level)
                 {
-                    case DebugLevel.ERROR: Debug.LogErrorFormat(fmt, args); break;
-                    case DebugLevel.WARNING: Debug.LogWarningFormat(fmt, args); break;
-                    case DebugLevel.INFO: Debug.LogFormat(fmt, args); break;
-                    case DebugLevel.ALL: Debug.LogFormat(fmt, args); break;
+                    case LogLevel.Error: Debug.LogErrorFormat(fmt, args); break;
+                    case LogLevel.Warning: Debug.LogWarningFormat(fmt, args); break;
+                    default: Debug.LogFormat(fmt, args); break;
                 }
             }
             else
             {
                 switch (level)
                 {
-                    case DebugLevel.ERROR: Debug.LogErrorFormat(obj, fmt, args); break;
-                    case DebugLevel.WARNING: Debug.LogWarningFormat(obj, fmt, args); break;
-                    case DebugLevel.INFO: Debug.LogFormat(obj, fmt, args); break;
-                    case DebugLevel.ALL: Debug.LogFormat(obj, fmt, args); break;
+                    case LogLevel.Error: Debug.LogErrorFormat(obj, fmt, args); break;
+                    case LogLevel.Warning: Debug.LogWarningFormat(obj, fmt, args); break;
+                    default: Debug.LogFormat(obj, fmt, args); break;
                 }
             }
         }
-        private static string GetFormatString(DebugLevel level, string tag, string objName,  string fmt)
+        private static string GetFormatString(LogLevel level, string tag, string objName,  string fmt)
         {
             return string.Format("[{0}] [{1}] [{2}] [{3}] {4}", GetTimestamp(), level, tag, objName, fmt);
         }

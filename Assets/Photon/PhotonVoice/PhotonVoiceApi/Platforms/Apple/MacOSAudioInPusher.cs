@@ -30,7 +30,7 @@ namespace Photon.Voice.MacOS
                 {
                     Error = "Exception in AudioInPusher constructor";
                 }
-                logger.LogError("[PV] AudioInPusher: " + Error);
+                logger.Log(LogLevel.Error, "[PV] AudioInPusher: " + Error);
             }
         }
 

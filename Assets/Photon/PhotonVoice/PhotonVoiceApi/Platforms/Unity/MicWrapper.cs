@@ -25,7 +25,7 @@ namespace Photon.Voice.Unity
                 }
 
                 this.mic = UnityMicrophone.Start(device, true, 1, frequency);
-                logger.LogInfo("[PV] MicWrapper: microphone '{0}' initialized, frequency = {1}, channels = {2}.", device, this.mic.frequency, this.mic.channels);
+                logger.Log(LogLevel.Info, "[PV] MicWrapper: microphone '{0}' initialized, frequency = {1}, channels = {2}.", device, this.mic.frequency, this.mic.channels);
             }
             catch (Exception e)
             {
@@ -34,7 +34,7 @@ namespace Photon.Voice.Unity
                 {
                     Error = "Exception in MicWrapper constructor";
                 }
-                logger.LogError("[PV] MicWrapper: " + Error);
+                logger.Log(LogLevel.Error, "[PV] MicWrapper: " + Error);
             }
         }
 
@@ -70,7 +70,7 @@ namespace Photon.Voice.Unity
             if (mic.channels == 0)
             {
                 Error = "Number of channels is 0 in Read()";
-                logger.LogError("[PV] MicWrapper: " + Error);
+                logger.Log(LogLevel.Error, "[PV] MicWrapper: " + Error);
                 return false;
             }
             var bufferSamplesCount = buffer.Length / mic.channels;

@@ -11,7 +11,6 @@
 
 namespace Photon.Voice.Unity
 {
-    using ExitGames.Client.Photon;
     using UnityEngine;
 
     // All Voice components should inherit this class. If this is not possible, reimplenet it directly in the component.
@@ -63,7 +62,8 @@ namespace Photon.Voice.Unity
                 objName = n;
             }
 
-            private void Log(DebugLevel level, string fmt, params object[] args)
+            public LogLevel Level { get; set; }
+            public void Log(LogLevel level, string fmt, params object[] args)
             {
                 if (voiceLogger != null)
                 {
@@ -76,26 +76,6 @@ namespace Photon.Voice.Unity
                 {
                     UnityLogger.Log(level, obj, tag, objName, fmt, args);
                 }
-            }
-
-            public void LogError(string fmt, params object[] args)
-            {
-                Log(DebugLevel.ERROR, fmt, args);
-            }
-
-            public void LogWarning(string fmt, params object[] args)
-            {
-                Log(DebugLevel.WARNING, fmt, args);
-            }
-
-            public void LogInfo(string fmt, params object[] args)
-            {
-                Log(DebugLevel.INFO, fmt, args);
-            }
-
-            public void LogDebug(string fmt, params object[] args)
-            {
-                Log(DebugLevel.ALL, fmt, args);
             }
         }
 
@@ -121,7 +101,7 @@ namespace Photon.Voice.Unity
             if (voiceLogger == null)
             {
                 // logging this message with just created voiceLogger produces confusing items relevant to mb only
-                logger.LogWarning("VoiceLogger object is not found in the scene. Creating one.");
+                logger.Log(LogLevel.Warning, "VoiceLogger object is not found in the scene. Creating one.");
                 voiceLogger = VoiceLogger.CreateRootLogger();
             }
 

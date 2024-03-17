@@ -99,7 +99,11 @@ PluginImporter:
       VisionOS: VisionOS
     second:
       enabled: 1
-      settings: {}
+      settings:
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
@@ -116,6 +120,7 @@ PluginImporter:
       enabled: 1
       settings:
         AddToEmbeddedBinaries: false
+        CPU: AnyCPU
         CompileFlags: 
         FrameworkDependencies: 
   userData: 

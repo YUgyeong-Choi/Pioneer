@@ -237,7 +237,7 @@ namespace Photon.Voice
                 }
                 catch (DllNotFoundException e)
                 {
-                    logger.LogError("{0} SoundTouch library not found, disabling HQ tempo mode: {1}", this.logPrefix, e);
+                    logger.Log(LogLevel.Error, "{0} SoundTouch library not found, disabling HQ tempo mode: {1}", this.logPrefix, e);
                     tempoChangeHQ = false;
                 }
             }
@@ -252,7 +252,7 @@ namespace Photon.Voice
             OutCreate(frequency, channels, bufferSamples);
             OutStart();
             this.started = true;
-            this.logger.LogInfo("{0} Start: {1} bs={2} ch={3} f={4} tds={5} utds={6} mds={7} speed={8} tempo={9}", this.logPrefix, sizeofT == 2 ? "short" : "float", bufferSamples, channels, frequency, targetDelaySamples, upperTargetDelaySamples, maxDelaySamples, playDelayConfig.SpeedUpPerc, tempoChangeHQ ? "HQ" : "LQ");
+            this.logger.Log(LogLevel.Info, "{0} Start: {1} bs={2} ch={3} f={4} tds={5} utds={6} mds={7} speed={8} tempo={9}", this.logPrefix, sizeofT == 2 ? "short" : "float", bufferSamples, channels, frequency, targetDelaySamples, upperTargetDelaySamples, maxDelaySamples, playDelayConfig.SpeedUpPerc, tempoChangeHQ ? "HQ" : "LQ");
         }
 
         ConcurrentQueue<T[]> frameQueue = new ConcurrentQueue<T[]>();
@@ -272,7 +272,7 @@ namespace Photon.Voice
                 {
                     if (this.debugInfo)
                     {
-                        this.logger.LogDebug("{0} overrun {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                        logger.Log(LogLevel.Debug, "{0} overrun {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                     }
                     this.writeSamplePos = (playSamplePos + maxDelaySamples) % this.bufferSamples;
                     lagSamples = maxDelaySamples;
@@ -281,7 +281,7 @@ namespace Photon.Voice
                 {
                     if (this.debugInfo)
                     {
-                        this.logger.LogDebug("{0} underrun {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                        logger.Log(LogLevel.Debug, "{0} underrun {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                     }
                     this.writeSamplePos = (playSamplePos + targetDelaySamples) % this.bufferSamples;
                     lagSamples = targetDelaySamples;
@@ -293,7 +293,7 @@ namespace Photon.Voice
                 this.flushed = true;
                 if (this.debugInfo)
                 {
-                    this.logger.LogDebug("{0} stream flush pause {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                    logger.Log(LogLevel.Debug, "{0} stream flush pause {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                 }
                 if (catchingUp)
                 {
@@ -307,7 +307,7 @@ namespace Photon.Voice
                     catchingUp = false;
                     if (this.debugInfo)
                     {
-                        this.logger.LogDebug("{0} stream sync reset {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                        logger.Log(LogLevel.Debug, "{0} stream sync reset {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                     }
                 }
 
@@ -322,7 +322,7 @@ return;
                     this.flushed = false;
                     if (this.debugInfo)
                     {
-                        this.logger.LogDebug("{0} stream unpause {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                        logger.Log(LogLevel.Debug, "{0} stream unpause {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                     }
                 }
             }
@@ -345,7 +345,7 @@ return;
                 catchingUp = true;
                 if (this.debugInfo)
                 {
-                    this.logger.LogDebug("{0} stream sync started {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                    logger.Log(LogLevel.Debug, "{0} stream sync started {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                 }
             }
 
@@ -372,7 +372,7 @@ return;
                 catchingUp = false;
                 if (this.debugInfo)
                 {
-                    this.logger.LogDebug("{0} stream sync finished {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
+                    logger.Log(LogLevel.Debug, "{0} stream sync finished {1} {2} {3} {4} {5}", this.logPrefix, upperTargetDelaySamples, lagSamples, playSamplePos, this.writeSamplePos, playSamplePos + targetDelaySamples);
                 }
             }
 
@@ -494,7 +494,7 @@ return;
 
             if (frame.Length != this.frameSize)
             {
-                logger.LogError("{0} audio frames are not of size: {1} != {2}", this.logPrefix, frame.Length, this.frameSize);
+                logger.Log(LogLevel.Error, "{0} audio frames are not of size: {1} != {2}", this.logPrefix, frame.Length, this.frameSize);
                 return;
             }
 

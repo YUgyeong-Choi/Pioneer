@@ -78,27 +78,27 @@ namespace Photon.Voice.Unity
         public static string CheckDevice(Voice.ILogger logger, string logPref, string device, int suggestedFrequency, out int frequency)
         {
 #if NO_MICROPHONE_API
-            logger.LogError(logPref + webglIsnotSupported);
+            logger.Log(LogLevel.Error, logPref + webglIsnotSupported);
             frequency = 0;
             return webglIsnotSupported;
 #else
             if (Microphone.devices.Length < 1)
             {
                 var err = "No microphones found (Microphone.devices is empty)";
-                logger.LogError(logPref + err);
+                logger.Log(LogLevel.Error, logPref + err);
                 frequency = 0;
                 return err;
             }
             if (!string.IsNullOrEmpty(device) && !Microphone.devices.Contains(device))
             {
                 var err = string.Format("[PV] MicWrapper: \"{0}\" is not a valid Unity microphone device, falling back to default one", device);
-                logger.LogError(logPref + err);
+                logger.Log(LogLevel.Error, logPref + err);
                 frequency = 0;
                 return err;
             }
             int minFreq;
             int maxFreq;
-            logger.LogInfo("[PV] MicWrapper: initializing microphone '{0}', suggested frequency = {1}).", device, suggestedFrequency);
+            logger.Log(LogLevel.Info, "[PV] MicWrapper: initializing microphone '{0}', suggested frequency = {1}).", device, suggestedFrequency);
             Microphone.GetDeviceCaps(device, out minFreq, out maxFreq);
             frequency = suggestedFrequency;
 
@@ -108,7 +108,7 @@ namespace Photon.Voice.Unity
                 if (suggestedFrequency != minFreq && suggestedFrequency != maxFreq)
                 {
                     int setFrequency = suggestedFrequency <= minFreq ? minFreq : maxFreq;
-                    logger.LogWarning(logPref + "microphone does not support suggested frequency {0} (supported frequencies are: {1} and {2}). Setting to {3}",
+                    logger.Log(LogLevel.Warning, logPref + "microphone does not support suggested frequency {0} (supported frequencies are: {1} and {2}). Setting to {3}",
                         suggestedFrequency, minFreq, maxFreq, setFrequency);
                     frequency = setFrequency;
                 }
@@ -117,7 +117,7 @@ namespace Photon.Voice.Unity
             {
                 if (suggestedFrequency < minFreq || maxFreq != 0 && suggestedFrequency > maxFreq)
                 {
-                    logger.LogWarning(logPref + "microphone does not support suggested frequency {0} (min: {1}, max: {2}). Setting to {2}",
+                    logger.Log(LogLevel.Warning, logPref + "microphone does not support suggested frequency {0} (min: {1}, max: {2}). Setting to {2}",
                         suggestedFrequency, minFreq, maxFreq);
                     frequency = maxFreq;
                 }

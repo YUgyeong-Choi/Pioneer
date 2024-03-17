@@ -81,11 +81,11 @@ namespace Photon.Voice.Unity
             if (err != 0)
             {
                 Error = "Can't initialize: handle = " + handle + ", error = " + err;
-                logger.LogError("[PV] WebAudioAudioOut: " + Error);
+                logger.Log(LogLevel.Error, "[PV] WebAudioAudioOut: " + Error);
             }
             else
             {
-                logger.LogInfo("[PV] WebAudioAudioOut initialized, handle = {0}, frequency = {1}, channels = {2}, bufferSamples = {3}", handle, frequency, channels, bufferSamples);
+                logger.Log(LogLevel.Info, "[PV] WebAudioAudioOut initialized, handle = {0}, frequency = {1}, channels = {2}, bufferSamples = {3}", handle, frequency, channels, bufferSamples);
             }
         }
 

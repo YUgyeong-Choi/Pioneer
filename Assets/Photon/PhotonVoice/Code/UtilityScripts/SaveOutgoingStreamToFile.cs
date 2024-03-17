@@ -17,14 +17,14 @@
             if (photonVoiceCreatedParams.Voice is LocalVoiceAudioFloat)
             {
                 this.wavWriter = new WaveWriter(filePath, voiceInfo.SamplingRate, 32, voiceInfo.Channels);
-                this.Logger.LogInfo("Outgoing 32 bit stream {0}, output file path: {1}", voiceInfo, filePath);
+                this.Logger.Log(LogLevel.Info, "Outgoing 32 bit stream {0}, output file path: {1}", voiceInfo, filePath);
                 LocalVoiceAudioFloat localVoiceAudioFloat = photonVoiceCreatedParams.Voice as LocalVoiceAudioFloat;
                 localVoiceAudioFloat.AddPostProcessor(new OutgoingStreamSaverFloat(this.wavWriter));
             }
             else if (photonVoiceCreatedParams.Voice is LocalVoiceAudioShort)
             {
                 this.wavWriter = new WaveWriter(filePath, voiceInfo.SamplingRate, 16, voiceInfo.Channels);
-                this.Logger.LogInfo("Outgoing 16 bit stream {0}, output file path: {1}", voiceInfo, filePath);
+                this.Logger.Log(LogLevel.Info, "Outgoing 16 bit stream {0}, output file path: {1}", voiceInfo, filePath);
                 LocalVoiceAudioShort localVoiceAudioShort = photonVoiceCreatedParams.Voice as LocalVoiceAudioShort;
                 localVoiceAudioShort.AddPostProcessor(new OutgoingStreamSaverShort(this.wavWriter));
             }
@@ -39,7 +39,7 @@
         private void PhotonVoiceRemoved()
         {
             this.wavWriter.Dispose();
-            this.Logger.LogInfo("Recording stopped: Saving wav file.");
+            this.Logger.Log(LogLevel.Info, "Recording stopped: Saving wav file.");
         }
 
         class OutgoingStreamSaverFloat : IProcessor<float>

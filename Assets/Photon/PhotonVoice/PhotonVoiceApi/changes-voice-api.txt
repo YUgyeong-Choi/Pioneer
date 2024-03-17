@@ -1,5 +1,24 @@
 Photon Voice API Change Log
 
+v2.55 (February 26, 2024)
+Core:
+   ADDED: VisionOS support (Opus and WebRTC Audio libraries)
+   BREAKING: ILogger.Log*() methods replaced with LogLevel enum and single Log() method accepting logging level
+   BREAKING: added ILogger.Level property, that Voice code can check to avoid unnecessary Log() methods calls
+   ADDED: LogLevel.Trace logging level
+   BREAKING: LoadBalancingTransport is no longer ILogger, user code must provide Voice components with ILogger implementation (like Unity.Logger)
+   ADDED: LoadBalancingTransport (and VoiceCLient created by the transport) uses private LBCLogger relying on LoadBalancingClient.DebugReturn() if not provided with an external ILogger
+   FIXED: frameReadPos advance and lost frames detection resulted in false lost frames reports and null frames input to the decoder
+   FIXED: read to write delay was 1 frame larger than set; now if DelayFrames is 0 in unfragmented mode, just written frame can be read immediately
+   FIXED: config frames also put in the normal frame queue to avoid processing it as a lost frame
+   BREAKING: removed VoiceClient.FramesMiss (it's hard to count and not very useful) and FramesLateUsed
+   BREAKING: added IPreviewManager.Has() that allows a ui builder to skip objects that do not have a preview but would otherwise take space in the layout
+Android:
+   CHANGED: AndroidVideoEncoder: Dispose() called for buffer objects in data callback to release resources earlier
+   FIXED: without objects disposal, the app crashed with 'JNI ERROR (app bug): global reference table overflow' error after a few minutes of running (probably a regression bug)
+FMOD:
+   FIXED: FMOD.AudioOutEvent playback (OutPos returns the position not wrapped by the event length)
+
 v2.54 (January 08, 2024)
 Core:
    FIXED: Set() was called sometimes on closed RemoteVoice.frameQueueReady AutoResetEvent
