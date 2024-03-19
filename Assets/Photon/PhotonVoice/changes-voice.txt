@@ -1,5 +1,24 @@
 Photon Voice 2 Change Log
 
+v2.55 (February 26, 2024)
+   PUN2: v2.45 (PUN2.45) 
+   RT/lib: v4.1.8.0
+   PhotonVoiceApi: revision 7409
+   Unity: 2019.4.39 or higher
+   UPDATED: Photon3Unity3D.dll, Photon Realtime (LoadBalancing) to v4.1.8.0
+   UPDATED: PUN to v2.45
+   ADDED: VisionOS support (Opus and WebRTC Audio libraries)
+Core:
+   BREAKING: ILogger.Log*() methods replaced with LogLevel enum and single Log() method accepting logging level
+   BREAKING: added ILogger.Level property, that Voice code can check to avoid unnecessary Log() methods calls
+   ADDED: LogLevel.Trace logging level
+   BREAKING: LoadBalancingTransport is no longer ILogger, user code must provide Voice components with ILogger implementation (like Unity.Logger)
+   ADDED: LoadBalancingTransport (and VoiceCLient created by the transport) uses private LBCLogger relying on LoadBalancingClient.DebugReturn() if not provided with an external ILogger
+FMOD:
+   FIXED: FMOD.AudioOutEvent playback (OutPos returns the position not wrapped by the event length)
+PS4/PS5:
+   CHANGED: Speaker.OutputPlugin property is exposed in Speaker's Editor inspector
+
 v2.54 (January 08, 2024)
    PUN2: v2.43 (PUN2.43)
    RT/lib: v4.1.7.1

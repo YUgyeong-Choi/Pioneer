@@ -237,18 +237,18 @@ namespace Photon.Realtime
         /// This is the default encryption mode: Messages get encrypted only on demand (when you send operations with the "encrypt" parameter set to true).
         /// </summary>
         PayloadEncryption,
-        /// <summary>
-        /// With this encryption mode for UDP, the connection gets setup and all further datagrams get encrypted almost entirely. On-demand message encryption (like in PayloadEncryption) is unavailable.
-        /// </summary>
-        DatagramEncryption = 10,
-        /// <summary>
-        /// With this encryption mode for UDP, the connection gets setup with random sequence numbers and all further datagrams get encrypted almost entirely. On-demand message encryption (like in PayloadEncryption) is unavailable.
-        /// </summary>
-        DatagramEncryptionRandomSequence = 11,
         ///// <summary>
-        ///// Same as above except that GCM mode is used to encrypt data.
+        ///// With this encryption mode for UDP, the connection gets setup and all further datagrams get encrypted almost entirely. On-demand message encryption (like in PayloadEncryption) is unavailable.
         ///// </summary>
-        //DatagramEncryptionGCMRandomSequence = 12,
+        //DatagramEncryption = 10,
+        ///// <summary>
+        ///// With this encryption mode for UDP, the connection gets setup with random sequence numbers and all further datagrams get encrypted almost entirely. On-demand message encryption (like in PayloadEncryption) is unavailable.
+        ///// </summary>
+        //DatagramEncryptionRandomSequence = 11,
+        /////// <summary>
+        /////// Same as above except that GCM mode is used to encrypt data.
+        /////// </summary>
+        ////DatagramEncryptionGCMRandomSequence = 12,
         /// <summary>
         /// Datagram Encryption with GCM.
         /// </summary>
@@ -872,6 +872,29 @@ namespace Photon.Realtime
         // connect to Best Region via Name Server
         // connect to Master Server (no Name Server, no appid)
 
+        /// <summary>Starts the "process" to connect as defined by the appSettings (AppId, AppVersion, Transport Protocol, Port and more).</summary>
+        /// <remarks>
+        /// A typical connection process wraps up these steps:<br/>
+        /// - Low level connect and init (which establishes a connection that enables operations and responses for the Realtime API).<br/>
+        /// - GetRegions and select best (unless FixedRegion is being used).<br/>
+        /// - Authenticate user for a specific region (this provides a Master Server address to go to and a token).<br/>
+        /// - Disconnect Name Server and connect to Master Server (using the token).<br/>
+        /// - The callback OnConnectedToMaster gets called.<br/>
+        /// <br/>
+        /// Connecting to the servers is a process and this is a non-blocking method.<br/>
+        /// Implement and register the IConnectionCallbacks interface to get callbacks about success or failing connects.<br/>
+        /// <br/>
+        /// Basically all settings for the connection, AppId and servers can be done via the provided parameter.<br/>
+        /// <br/>
+        /// Connecting to the Photon Cloud might fail due to:<br/>
+        /// - Network issues<br/>
+        /// - Region not available<br/>
+        /// - Subscription CCU limit<br/>
+        /// </remarks>
+        /// <see cref="IConnectionCallbacks"/>
+        /// <see cref="AuthValues"/>
+        /// <param name="appSettings">Collection of settings defining this app and how to connect.</param>
+        /// <returns>True if the client can attempt to connect.</returns>
         public virtual bool ConnectUsingSettings(AppSettings appSettings)
         {
             if (this.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
@@ -1660,7 +1683,8 @@ namespace Photon.Realtime
         /// This method can only be called while connected to a Master Server.
         /// This client's State is set to ClientState.Joining immediately.
         ///
-        /// Either IMatchmakingCallbacks.OnJoinedRoom or IMatchmakingCallbacks.OnCreatedRoom get called.
+        /// For success, IMatchmakingCallbacks.OnJoinedRoom or IMatchmakingCallbacks.OnCreatedRoom get called.
+        /// In error cases IMatchmakingCallbacks.OnJoinRoomFailed or IMatchmakingCallbacks.OnJoinRandomRoomFailed get called.
         ///
         /// More about matchmaking:
         /// https://doc.photonengine.com/en-us/realtime/current/reference/matchmaking-and-lobby
@@ -1960,7 +1984,7 @@ namespace Photon.Realtime
         ///
         /// This is an async request which triggers a OnOperationResponse() call.
         /// </remarks>
-        /// <see cref="https://doc.photonengine.com/en-us/realtime/current/reference/matchmaking-and-lobby#sql_lobby_type"/>
+        /// <see href="https://doc.photonengine.com/en-us/realtime/current/reference/matchmaking-and-lobby#sql_lobby_type"/>
         /// <param name="typedLobby">The lobby to query. Has to be of type SqlLobby.</param>
         /// <param name="sqlLobbyFilter">The sql query statement.</param>
         /// <returns>If the operation could be sent (has to be connected).</returns>
@@ -3309,7 +3333,7 @@ namespace Photon.Realtime
                         this.UpdatedActorList(actorsInRoom);
 
                         // any operation that does a "rejoin" will set this value to true. this can indicate if the local player returns to a room.
-                        originatingPlayer.HasRejoined = this.enterRoomParamsCache.JoinMode == JoinMode.RejoinOnly;
+                        originatingPlayer.HasRejoined = this.enterRoomParamsCache != null && this.enterRoomParamsCache.JoinMode == JoinMode.RejoinOnly;
 
                         this.State = ClientState.Joined;
 
@@ -3501,14 +3525,14 @@ namespace Photon.Realtime
                     byte[] encryptionSecret = (byte[])encryptionData[EncryptionDataParameters.Secret1];
                     this.LoadBalancingPeer.InitPayloadEncryption(encryptionSecret);
                     break;
-                case EncryptionMode.DatagramEncryption:
-                case EncryptionMode.DatagramEncryptionRandomSequence:
-                    {
-                        byte[] secret1 = (byte[])encryptionData[EncryptionDataParameters.Secret1];
-                        byte[] secret2 = (byte[])encryptionData[EncryptionDataParameters.Secret2];
-                        this.LoadBalancingPeer.InitDatagramEncryption(secret1, secret2, mode == EncryptionMode.DatagramEncryptionRandomSequence);
-                    }
-                    break;
+                //case EncryptionMode.DatagramEncryption:
+                //case EncryptionMode.DatagramEncryptionRandomSequence:
+                //    {
+                //        byte[] secret1 = (byte[])encryptionData[EncryptionDataParameters.Secret1];
+                //        byte[] secret2 = (byte[])encryptionData[EncryptionDataParameters.Secret2];
+                //        this.LoadBalancingPeer.InitDatagramEncryption(secret1, secret2, mode == EncryptionMode.DatagramEncryptionRandomSequence);
+                //    }
+                //    break;
                 case EncryptionMode.DatagramEncryptionGCM:
                     {
                         byte[] secret1 = (byte[])encryptionData[EncryptionDataParameters.Secret1];
@@ -3580,7 +3604,7 @@ namespace Photon.Realtime
         /// The covered callback interfaces are: IConnectionCallbacks, IMatchmakingCallbacks,
         /// ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback and IWebRpcCallback.
         ///
-        /// See: <a href="https://doc.photonengine.com/en-us/realtime/current/reference/dotnet-callbacks"/>
+        /// See: <a href="https://doc.photonengine.com/en-us/realtime/current/reference/dotnet-callbacks">DotNet Callbacks</a>
         /// </remarks>
         /// <param name="target">The object that registers to get callbacks from this client.</param>
         public void AddCallbackTarget(object target)
@@ -3757,7 +3781,7 @@ namespace Photon.Realtime
         ///
         /// Example: void OnCustomAuthenticationResponse(Dictionary&lt;string, object&gt; data) { ... }
         /// </remarks>
-        /// <see cref="https://doc.photonengine.com/en-us/realtime/current/reference/custom-authentication"/>
+        /// <see href="https://doc.photonengine.com/en-us/realtime/current/reference/custom-authentication"/>
         void OnCustomAuthenticationResponse(Dictionary<string, object> data);
 
         /// <summary>
@@ -3820,9 +3844,9 @@ namespace Photon.Realtime
         ///
         /// The list is sorted using two criteria: open or closed, full or not. So the list is composed of three groups, in this order:
         ///
-        /// first group: open and not full (joinable).</br>
-        /// second group: full but not closed (not joinable).</br>
-        /// third group: closed (not joinable, could be full or not).</br>
+        /// first group: open and not full (joinable).<br/>
+        /// second group: full but not closed (not joinable).<br/>
+        /// third group: closed (not joinable, could be full or not).<br/>
         ///
         /// In each group, entries do not have any particular order (random).
         ///
@@ -3928,7 +3952,7 @@ namespace Photon.Realtime
         void OnJoinRoomFailed(short returnCode, string message);
 
         /// <summary>
-        /// Called when a previous OpJoinRandom call failed on the server.
+        /// Called when a previous OpJoinRandom (or OpJoinRandomOrCreateRoom etc.) call failed on the server.
         /// </summary>
         /// <remarks>
         /// The most common causes are that a room is full or does not exist (due to someone else being faster or closing the room).

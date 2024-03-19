@@ -62,7 +62,7 @@ namespace VRUIP
             }
             if (canvas.GetComponent<OVRRaycaster>() != null) return;
             var ovrRaycaster = canvas.gameObject.AddComponent<OVRRaycaster>();
-            ovrRaycaster.pointer = VRUIPManager.instance.laserPointer.gameObject;
+            //ovrRaycaster.pointer = VRUIPManager.instance.laserPointer.gameObject;
             #else
             if (canvas.GetComponent<GraphicRaycaster>() != null) return;
             canvas.gameObject.AddComponent<GraphicRaycaster>();

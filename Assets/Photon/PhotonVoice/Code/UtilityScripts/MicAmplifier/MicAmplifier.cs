@@ -73,7 +73,7 @@ namespace Photon.Voice.Unity.UtilityScripts
             }
             else
             {
-                this.Logger.LogError("LocalVoice object has unexpected value/type: {0}", p.Voice == null ? "null" : p.Voice.GetType().ToString());
+                this.Logger.Log(LogLevel.Error, "LocalVoice object has unexpected value/type: {0}", p.Voice == null ? "null" : p.Voice.GetType().ToString());
             }
         }
     }

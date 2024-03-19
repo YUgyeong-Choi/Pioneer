@@ -91,7 +91,7 @@ namespace Photon.Voice
         {
 #if WINDOWS_UWP || ENABLE_WINMD_SUPPORT
             return new UWP.VideoInEnumerator(logger);
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+#elif UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new Unity.VideoInEnumerator(logger);
 #elif UNITY_ANDROID && !UNITY_EDITOR
             return new Unity.AndroidVideoInEnumerator(logger);
@@ -203,7 +203,7 @@ namespace Photon.Voice
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebCodecsVideoPlayerUnityTexture(logger, info, onReady);
 #endif
-#if UNITY_5_3_OR_NEWER // #if UNITY, multi-platform VideoPlayerUnity or generic VideoPlayer
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             var vdu = CreateDefaultVideoDecoder(logger, info);
             var vp = new Unity.VideoPlayerUnity(vdu, onReady);
             // assign Draw method copying Image to Unity texture as software decoder Output
@@ -253,7 +253,7 @@ namespace Photon.Voice
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebCodecsCameraRecorderUnityTexture(logger, info, camDevice.IDString, onReady);
 #else       // multi-platform VideoRecorderUnity
-#if UNITY_5_3_OR_NEWER // #if UNITY
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             var ve = CreateDefaultVideoEncoder(logger, info);
             if (ve is IEncoderDirectImage)
             {
@@ -285,7 +285,7 @@ namespace Photon.Voice
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebCodecsVideoPlayerUnityTexture(logger, info, onReady);
 #endif
-#if UNITY_5_3_OR_NEWER // #if UNITY, multi-platform VideoPlayerUnity or generic VideoPlayer
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             var vd = CreateDefaultVideoDecoder(logger, info);
             var vp = new Unity.VideoPlayerUnity(vd, onReady);
             // assign Draw method copying Image to Unity texture as software decoder Output
@@ -302,5 +302,5 @@ namespace Photon.Voice
         }
 #endif // UNITY_5_3_OR_NEWER
 #endif // PHOTON_VOICE_VIDEO_ENABLE
+        }
     }
-}

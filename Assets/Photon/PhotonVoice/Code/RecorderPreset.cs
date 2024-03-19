@@ -36,22 +36,22 @@ namespace Photon.Voice.Unity
                 {
                     if (rec == null)
                     {
-                        Logger.LogError("Can't find Recorder component");
+                        Logger.Log(LogLevel.Error, "Can't find Recorder component");
                     }
                     else
                     {
-                        Logger.LogInfo("Updating from preset for platform '{0}': Microphone Type = {1}, DSP Enabled = {2}", Application.platform, MicrophoneType, DSPEnabled);
+                        Logger.Log(LogLevel.Info, "Updating from preset for platform '{0}': Microphone Type = {1}, DSP Enabled = {2}", Application.platform, MicrophoneType, DSPEnabled);
                         rec.MicrophoneType = MicrophoneType;
                         if (dsp == null)
                         {
-                            Logger.LogError("Can't find WebRtcAudioDsp component");
+                            Logger.Log(LogLevel.Error, "Can't find WebRtcAudioDsp component");
                         }
                         else
                         {
                             dsp.enabled = DSPEnabled;
                             if (DSPEnabled)
                             {
-                                Logger.LogInfo("Updating from preset for platform '{0}': DSP.AEC = {1}, DSP.VAD = {2}", Application.platform, DSPSettings.AEC, DSPSettings.VAD);
+                                Logger.Log(LogLevel.Info, "Updating from preset for platform '{0}': DSP.AEC = {1}, DSP.VAD = {2}", Application.platform, DSPSettings.AEC, DSPSettings.VAD);
                                 dsp.AEC = DSPSettings.AEC;
                                 dsp.VAD = DSPSettings.VAD;
                             }

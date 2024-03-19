@@ -42,7 +42,7 @@ namespace Photon.Voice.IOS
                         {
                             Error = "Exception in AudioInReader constructor";
                         }
-                        logger.LogError("[PV] AudioInReader: " + Error);
+                        logger.Log(LogLevel.Error, "[PV] AudioInReader: " + Error);
                     }
                     finally
                     {

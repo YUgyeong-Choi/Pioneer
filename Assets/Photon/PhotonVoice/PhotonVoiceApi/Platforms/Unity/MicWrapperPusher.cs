@@ -28,7 +28,7 @@ namespace Photon.Voice.Unity
                     case AudioSpeakerMode.Stereo: this.channels = 2; break;
                     default:
                         Error = "Only Mono and Stereo project speaker mode supported. Current mode is " + AudioSettings.speakerMode;
-                        logger.LogError("[PV] MicWrapperPusher: " + Error);
+                        logger.Log(LogLevel.Error, "[PV] MicWrapperPusher: " + Error);
                         return;
                 }
 
@@ -43,7 +43,7 @@ namespace Photon.Voice.Unity
                 go.transform.SetParent(parent.transform, false);
 
                 this.audioSource = go.AddComponent<AudioSource>();
-                logger.LogInfo("[PV] MicWrapperPusher: new AudioSource created.");
+                logger.Log(LogLevel.Info, "[PV] MicWrapperPusher: new AudioSource created.");
 
                 this.onRead = go.AddComponent<MicWrapperPusherOnAudioFilterRead>();
 
@@ -64,12 +64,12 @@ namespace Photon.Voice.Unity
                 }
                 if (UnityMicrophone.GetPosition(device) <= 0)
                 {
-                    logger.LogWarning("[PV] MicWrapperPusher: microphone start takes too long, Playing audio source without waiting for the microphone. Captured data may be delayed.");
+                    logger.Log(LogLevel.Warning, "[PV] MicWrapperPusher: microphone start takes too long, Playing audio source without waiting for the microphone. Captured data may be delayed.");
                 }
 
                 this.audioSource.Play();
 
-                logger.LogInfo("[PV] MicWrapperPusher: microphone '{0}' initialized, frequency = {1}, channels = {2}.", device, this.mic.frequency, this.mic.channels);
+                logger.Log(LogLevel.Info, "[PV] MicWrapperPusher: microphone '{0}' initialized, frequency = {1}, channels = {2}.", device, this.mic.frequency, this.mic.channels);
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ namespace Photon.Voice.Unity
                 {
                     Error = "Exception in MicWrapperPusher constructor";
                 }
-                logger.LogError("[PV] MicWrapperPusher: " + Error);
+                logger.Log(LogLevel.Error, "[PV] MicWrapperPusher: " + Error);
             }
         }
 
@@ -93,7 +93,7 @@ namespace Photon.Voice.Unity
             if (audioSource != null)
             {
                 GameObject.Destroy(audioSource.gameObject); // remove dynamically created object
-                logger.LogInfo("[PV] MicWrapperPusher: AudioSource removed.");
+                logger.Log(LogLevel.Info, "[PV] MicWrapperPusher: AudioSource removed.");
             }
         }
 

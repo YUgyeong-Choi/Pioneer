@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_ANDROID || UNITY_WSA
+﻿#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_VISIONOS || UNITY_ANDROID || UNITY_WSA
 #define PLATFORM_IS_SUPPORTED
 #endif
 
@@ -215,7 +215,7 @@ namespace Photon.Voice.Unity
             }
             else
             {
-                this.Logger.LogWarning("WebRtcAudioDsp is not supported on this platform {0}. The component will be disabled.", Application.platform);
+                this.Logger.Log(LogLevel.Warning, "WebRtcAudioDsp is not supported on this platform {0}. The component will be disabled.", Application.platform);
             }
         }
 
@@ -235,24 +235,24 @@ namespace Photon.Voice.Unity
             if (IsSupported && enabled)
             {
                 st = AudioSampleType.Short;
-                this.Logger.LogInfo("Type Conversion set to Short. Audio samples will be converted if source samples types differ.");
+                this.Logger.Log(LogLevel.Info, "Type Conversion set to Short. Audio samples will be converted if source samples types differ.");
                 // WebRTC DSP supports 8000 16000 [32000] 48000 Hz
                 // TODO: correct, opus-independent parameters matching implementation.
                 // The code below relies on the assumption that voiceInfo.SamplingRate is from POpusCodec.Enums.SamplingRate set.
                 switch (voiceInfo.SamplingRate)
                 {
                     case 12000:
-                        this.Logger.LogWarning("Sampling rate requested (12kHz) is not supported by WebRtcAudioDsp, switching to the closest supported value: 16kHz.");
+                        this.Logger.Log(LogLevel.Warning, "Sampling rate requested (12kHz) is not supported by WebRtcAudioDsp, switching to the closest supported value: 16kHz.");
                         voiceInfo.SamplingRate = 16000;
                         break;
                     case 24000:
-                        this.Logger.LogWarning("Sampling rate requested (24kHz) is not supported by WebRtcAudioDsp, switching to the closest supported value: 48kHz.");
+                        this.Logger.Log(LogLevel.Warning, "Sampling rate requested (24kHz) is not supported by WebRtcAudioDsp, switching to the closest supported value: 48kHz.");
                         voiceInfo.SamplingRate = 48000;
                         break;
                 }
                 if (voiceInfo.FrameDurationUs < 10000)
                 {
-                    this.Logger.LogWarning("Frame duration requested ({0}ms) is not supported by WebRtcAudioDsp (it needs to be N x 10ms), switching to the closest supported value: 10ms.", (int)voiceInfo.FrameDurationUs / 1000);
+                    this.Logger.Log(LogLevel.Warning, "Frame duration requested ({0}ms) is not supported by WebRtcAudioDsp (it needs to be N x 10ms), switching to the closest supported value: 10ms.", (int)voiceInfo.FrameDurationUs / 1000);
                     voiceInfo.FrameDurationUs = 10000;
                 }
             }
@@ -262,13 +262,13 @@ namespace Photon.Voice.Unity
         {
             if (this.outputSampleRate != AudioSettings.outputSampleRate)
             {
-                this.Logger.LogInfo("AudioConfigChange: outputSampleRate from {0} to {1}. WebRtcAudioDsp will be restarted.", this.outputSampleRate, AudioSettings.outputSampleRate);
+                this.Logger.Log(LogLevel.Info, "AudioConfigChange: outputSampleRate from {0} to {1}. WebRtcAudioDsp will be restarted.", this.outputSampleRate, AudioSettings.outputSampleRate);
                 this.outputSampleRate = AudioSettings.outputSampleRate;
                 this.Restart();
             }
             if (this.reverseChannels != channelsMap[AudioSettings.speakerMode])
             {
-                this.Logger.LogInfo("AudioConfigChange: speakerMode channels from {0} to {1}. WebRtcAudioDsp will be restarted.", this.reverseChannels, channelsMap[AudioSettings.speakerMode]);
+                this.Logger.Log(LogLevel.Info, "AudioConfigChange: speakerMode channels from {0} to {1}. WebRtcAudioDsp will be restarted.", this.reverseChannels, channelsMap[AudioSettings.speakerMode]);
                 this.reverseChannels = channelsMap[AudioSettings.speakerMode];
                 this.Restart();
             }
@@ -280,7 +280,7 @@ namespace Photon.Voice.Unity
         {
             if (outChannels != this.reverseChannels)
             {
-                this.Logger.LogWarning("OnAudioOutFrame channel count {0} != initialized {1}.", outChannels, this.reverseChannels);
+                this.Logger.Log(LogLevel.Warning, "OnAudioOutFrame channel count {0} != initialized {1}.", outChannels, this.reverseChannels);
             }
             else
             {
@@ -295,7 +295,7 @@ namespace Photon.Voice.Unity
             {
                 if (p.Voice.Info.Channels != 1)
                 {
-                    this.Logger.LogError("Only mono audio signals supported. WebRtcAudioDsp component will be disabled.");
+                    this.Logger.Log(LogLevel.Error, "Only mono audio signals supported. WebRtcAudioDsp component will be disabled.");
                     return;
                 }
                 if (p.Voice is LocalVoiceAudioShort voice)
@@ -305,7 +305,7 @@ namespace Photon.Voice.Unity
                 }
                 else
                 {
-                    this.Logger.LogError("Only short audio voice supported. WebRtcAudioDsp component will be disabled.");
+                    this.Logger.Log(LogLevel.Error, "Only short audio voice supported. WebRtcAudioDsp component will be disabled.");
                 }
             }
         }
@@ -325,7 +325,7 @@ namespace Photon.Voice.Unity
 
         private void StartProc(LocalVoiceAudioShort v)
         {
-            this.Logger.LogInfo("Start");
+            this.Logger.Log(LogLevel.Info, "Start");
             this.reverseChannels = channelsMap[AudioSettings.speakerMode];
             this.outputSampleRate = AudioSettings.outputSampleRate;
             this.proc = new WebRTCAudioProcessor(this.Logger, v.Info.FrameSize, v.Info.SamplingRate, v.Info.Channels, this.outputSampleRate, this.reverseChannels);
@@ -335,7 +335,7 @@ namespace Photon.Voice.Unity
 
         private void StopProc(LocalVoiceAudioShort v)
         {
-            this.Logger.LogInfo("Stop");
+            this.Logger.Log(LogLevel.Info, "Stop");
             this.setOutputListener(false);
             if (proc != null)
             {
@@ -350,7 +350,7 @@ namespace Photon.Voice.Unity
 
         private void Restart()
         {
-            this.Logger.LogInfo("Restart");
+            this.Logger.Log(LogLevel.Info, "Restart");
             this.StopProc(this.localVoice);
             if (this.localVoice != null)
             {

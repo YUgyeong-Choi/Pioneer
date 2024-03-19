@@ -95,7 +95,7 @@ namespace Photon.Voice
 
             if (content == null || contentLength < 3)
             {
-                this.LogError("[PV] onVoiceFrameEvent did not receive data (readable as byte[]) " + content0);
+                this.logger.Log(LogLevel.Error, "[PV] onVoiceFrameEvent did not receive data (readable as byte[]) " + content0);
             }
             else
             {

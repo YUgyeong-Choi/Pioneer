@@ -70,7 +70,7 @@ namespace Photon.Voice.Unity
                 audioIn = new AndroidJavaObject("com.exitgames.photon.audioinaec.AudioInAEC");
                 //bool aecAvailable = audioIn.Call<bool>("AECIsAvailable");
                 int minBufSize = audioIn.Call<int>("GetMinBufferSize", SAMPLE_RATE_44100, Channels);
-                logger.LogInfo("[PV] AndroidAudioInAEC: AndroidJavaObject created: aec: {0}/{1}, agc: {2}/{3}, ns: {4}/{5} minBufSize: {6}",
+                logger.Log(LogLevel.Info, "[PV] AndroidAudioInAEC: AndroidJavaObject created: aec: {0}/{1}, agc: {2}/{3}, ns: {4}/{5} minBufSize: {6}",
                     enableAEC, audioIn.Call<bool>("AECIsAvailable"),
                     enableAGC, audioIn.Call<bool>("AGCIsAvailable"),
                     enableNS, audioIn.Call<bool>("NSIsAvailable"),
@@ -84,12 +84,12 @@ namespace Photon.Voice.Unity
                 if (ok)
                 {
                     audioInSampleRate = audioIn.Call<int>("GetSampleRate");
-                    logger.LogInfo("[PV] AndroidAudioInAEC: AndroidJavaObject started: {0}, sampling rate: {1}, channels: {2}, record buffer size: {3}", ok, SamplingRate, Channels, minBufSize * 4);
+                    logger.Log(LogLevel.Info, "[PV] AndroidAudioInAEC: AndroidJavaObject started: {0}, sampling rate: {1}, channels: {2}, record buffer size: {3}", ok, SamplingRate, Channels, minBufSize * 4);
                 }
                 else
                 {
                     Error = "[PV] AndroidAudioInAEC constructor: calling Start java method failure";
-                    logger.LogError("[PV] AndroidAudioInAEC: {0}", Error);
+                    logger.Log(LogLevel.Error, "[PV] AndroidAudioInAEC: {0}", Error);
                 }
             }
             catch (Exception e)
@@ -99,7 +99,7 @@ namespace Photon.Voice.Unity
                 {
                     Error = "Exception in AndroidAudioInAEC constructor";
                 }
-                logger.LogError("[PV] AndroidAudioInAEC: {0}", Error);
+                logger.Log(LogLevel.Error, "[PV] AndroidAudioInAEC: {0}", Error);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Photon.Voice.Unity
             }
             if (Error != null)
             {
-                logger.LogError("[PV] AndroidAudioInAEC: {0}", Error);
+                logger.Log(LogLevel.Error, "[PV] AndroidAudioInAEC: {0}", Error);
             }
         }
 

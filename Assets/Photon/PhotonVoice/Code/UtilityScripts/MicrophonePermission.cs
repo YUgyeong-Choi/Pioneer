@@ -35,7 +35,7 @@ namespace Photon.Voice.Unity.UtilityScripts
             }
             private set
             {
-                this.Logger.LogInfo("Microphone Permission Granted: {0}", value);
+                this.Logger.Log(LogLevel.Info, "Microphone Permission Granted: {0}", value);
                 MicrophonePermissionCallback?.Invoke(value);
                 if (this.hasPermission != value)
                 {
@@ -47,13 +47,13 @@ namespace Photon.Voice.Unity.UtilityScripts
                         {
                             if (!recorder.RecordingEnabled)
                             {
-                                this.Logger.LogInfo("Starting recording automatically");
+                                this.Logger.Log(LogLevel.Info, "Starting recording automatically");
                             }
                             recorder.RecordingEnabled = true;
                         }
                         else
                         {
-                            this.Logger.LogInfo("Recorder not found. Assign MicrophonePermission to an object with Recorder to automatically start recording");
+                            this.Logger.Log(LogLevel.Info, "Recorder not found. Assign MicrophonePermission to an object with Recorder to automatically start recording");
                         }
                     }
                 }
@@ -70,7 +70,7 @@ namespace Photon.Voice.Unity.UtilityScripts
         IEnumerator PermissionCheck()
         {
             this.isRequesting = true;
-            this.Logger.LogInfo("iOS Microphone Permission Request");
+            this.Logger.Log(LogLevel.Info, "iOS Microphone Permission Request");
             yield return Application.RequestUserAuthorization(UserAuthorization.Microphone);
             this.isRequesting = false;
             if (Application.HasUserAuthorization(UserAuthorization.Microphone))
@@ -93,7 +93,7 @@ namespace Photon.Voice.Unity.UtilityScripts
             }
             else
             {
-                this.Logger.LogInfo("Android Microphone Permission Request");
+                this.Logger.Log(LogLevel.Info, "Android Microphone Permission Request");
 #if UNITY_2020_2_OR_NEWER
                 var callbacks = new PermissionCallbacks();
                 callbacks.PermissionDenied += PermissionCallbacks_PermissionDenied;
@@ -118,21 +118,21 @@ namespace Photon.Voice.Unity.UtilityScripts
         {
             this.isRequesting = false;
             this.HasPermission = false;
-            this.Logger.LogInfo($"{permissionName} PermissionDeniedAndDontAskAgain");
+            this.Logger.Log(LogLevel.Info, $"{permissionName} PermissionDeniedAndDontAskAgain");
         }
 
         internal void PermissionCallbacks_PermissionGranted(string permissionName)
         {
             this.isRequesting = false;
             this.HasPermission = true;
-            this.Logger.LogInfo($"{permissionName} PermissionGranted");
+            this.Logger.Log(LogLevel.Info, $"{permissionName} PermissionGranted");
         }
 
         internal void PermissionCallbacks_PermissionDenied(string permissionName)
         {
             this.isRequesting = false;
             this.HasPermission = false;
-            this.Logger.LogInfo($"{permissionName} PermissionDenied");
+            this.Logger.Log(LogLevel.Info, $"{permissionName} PermissionDenied");
         }
 #else
         private void OnApplicationFocus(bool focus)

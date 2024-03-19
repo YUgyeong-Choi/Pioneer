@@ -34,25 +34,25 @@
         {
             base.Awake();
             this.recorder = this.GetComponent<Recorder>();
-            this.Logger.LogInfo("Subscribing to system (audio) changes.");
+            this.Logger.Log(LogLevel.Info, "Subscribing to system (audio) changes.");
             this.photonMicChangeNotifier = Platform.CreateAudioInChangeNotifier(this.PhotonMicrophoneChangeDetected, this.Logger);
             if (this.photonMicChangeNotifier.IsSupported) // OSX, iOS, Switch
             {
                 if (this.photonMicChangeNotifier.Error == null)
                 {
-                    this.Logger.LogInfo("Subscribed to audio in change notifications via Photon plugin.");
+                    this.Logger.Log(LogLevel.Info, "Subscribed to audio in change notifications via Photon plugin.");
                 }
                 else
                 {
-                    this.Logger.LogError("Error creating instance of photonMicChangeNotifier: {0}", this.photonMicChangeNotifier.Error);
+                    this.Logger.Log(LogLevel.Error, "Error creating instance of photonMicChangeNotifier: {0}", this.photonMicChangeNotifier.Error);
                 }
             }
             else
             {
-                this.Logger.LogInfo("Skipped subscribing to audio change notifications via Photon's AudioInChangeNotifier as not supported on current platform: {0}", Application.platform);
+                this.Logger.Log(LogLevel.Info, "Skipped subscribing to audio change notifications via Photon's AudioInChangeNotifier as not supported on current platform: {0}", Application.platform);
                 // TODO: according to documentation, OnAudioConfigurationChanged fires on output device change, so in theory it will not work if only a microphone is added or removed.
                 AudioSettings.OnAudioConfigurationChanged += this.OnAudioConfigChanged;
-                this.Logger.LogInfo("Subscribed to audio configuration changes via Unity OnAudioConfigurationChanged callback.");
+                this.Logger.Log(LogLevel.Info, "Subscribed to audio configuration changes via Unity OnAudioConfigurationChanged callback.");
             }
         }
 
@@ -62,15 +62,15 @@
             {
                 this.photonMicChangeNotifier.Dispose();
                 this.photonMicChangeNotifier = null;
-                this.Logger.LogInfo("Unsubscribed from audio in change notifications via Photon plugin.");
+                this.Logger.Log(LogLevel.Info, "Unsubscribed from audio in change notifications via Photon plugin.");
             }
             AudioSettings.OnAudioConfigurationChanged -= this.OnAudioConfigChanged;
-            this.Logger.LogInfo("Unsubscribed from audio in change notifications via Unity OnAudioConfigurationChanged callback.");
+            this.Logger.Log(LogLevel.Info, "Unsubscribed from audio in change notifications via Unity OnAudioConfigurationChanged callback.");
         }
 
         private void PhotonMicrophoneChangeDetected()
         {
-            this.Logger.LogInfo("Microphones change detected by Photon native plugin.");
+            this.Logger.Log(LogLevel.Info, "Microphones change detected by Photon native plugin.");
             this.OnDeviceChange();
         }
 
@@ -95,17 +95,17 @@
             if (handle)
             {
                 this.recorder.MicrophoneDeviceChangeDetected();
-                this.Logger.LogInfo("Device change detected and the recording will be restarted.");
+                this.Logger.Log(LogLevel.Info, "Device change detected and the recording will be restarted.");
             }
             else
             {
-                this.Logger.LogInfo("Device change detected but its handling is disabled.");
+                this.Logger.Log(LogLevel.Info, "Device change detected but its handling is disabled.");
             }
         }
 
         private void OnAudioConfigChanged(bool deviceWasChanged)
         {
-            this.Logger.LogInfo("OnAudioConfigurationChanged: {0}", deviceWasChanged ? "Device was changed." : "AudioSettings.Reset was called.");
+            this.Logger.Log(LogLevel.Info, "OnAudioConfigurationChanged: {0}", deviceWasChanged ? "Device was changed." : "AudioSettings.Reset was called.");
             this.OnDeviceChange();
         }
     }

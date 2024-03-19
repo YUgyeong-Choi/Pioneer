@@ -14,7 +14,7 @@ namespace Photon.Voice.Unity.FMOD
             recorder.SourceType = Recorder.InputSourceType.Factory;
             recorder.InputFactory = () =>
             {
-                this.Logger.LogInfo("Setting recorder's source to FMOD factory with device={0}", recorder.MicrophoneDevice);
+                this.Logger.Log(LogLevel.Info, "Setting recorder's source to FMOD factory with device={0}", recorder.MicrophoneDevice);
                 return new Voice.FMOD.AudioInReader<short>(FMODUnity.RuntimeManager.CoreSystem, recorder.MicrophoneDevice.IDInt, (int)recorder.SamplingRate, this.Logger);
             };
         }

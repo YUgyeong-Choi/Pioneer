@@ -162,7 +162,7 @@ namespace Photon.Voice.Unity
 
 #region Properties
 
-        protected Voice.ILogger Logger => voiceComponentImpl.Logger;
+        public Voice.ILogger Logger => voiceComponentImpl.Logger;
         // to set logging level from code
         public VoiceLogger VoiceLogger => voiceComponentImpl.VoiceLogger;
 
@@ -242,7 +242,7 @@ namespace Photon.Voice.Unity
         {
             if (this.Client.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
             {
-                this.Logger.LogWarning("ConnectUsingSettings() failed. Can only connect while in state 'Disconnected'. Current state: {0}", this.Client.LoadBalancingPeer.PeerState);
+                this.Logger.Log(LogLevel.Warning, "ConnectUsingSettings() failed. Can only connect while in state 'Disconnected'. Current state: {0}", this.Client.LoadBalancingPeer.PeerState);
                 return false;
             }
             if (overwriteSettings != null)
@@ -251,12 +251,12 @@ namespace Photon.Voice.Unity
             }
             if (this.Settings == null)
             {
-                this.Logger.LogError("Settings are null");
+                this.Logger.Log(LogLevel.Error, "Settings are null");
                 return false;
             }
             if (string.IsNullOrEmpty(this.Settings.AppIdVoice) && string.IsNullOrEmpty(this.Settings.Server))
             {
-                this.Logger.LogError("Provide an AppId or a Server address in Settings to be able to connect");
+                this.Logger.Log(LogLevel.Error, "Provide an AppId or a Server address in Settings to be able to connect");
                 return false;
             }
             if (this.Settings.IsMasterServerAddress && string.IsNullOrEmpty(this.Client.UserId))
@@ -284,7 +284,7 @@ namespace Photon.Voice.Unity
                 RemoteVoiceLink rvl = this.cachedRemoteVoices[i];
                 if (userData.Equals(rvl.VoiceInfo.UserData))
                 {
-                    this.Logger.LogDebug("Speaker linking for remoteVoice {0}.", rvl);
+                    this.Logger.Log(LogLevel.Debug, "Speaker linking for remoteVoice {0}.", rvl);
                     this.LinkSpeaker(speaker, rvl);
                     return speaker.IsLinked;
                 }
@@ -378,7 +378,7 @@ namespace Photon.Voice.Unity
         {
             if (this.SpeakerPrefab == null)
             {
-                this.Logger.LogError("SpeakerPrefab is not set.");
+                this.Logger.Log(LogLevel.Error, "SpeakerPrefab is not set.");
                 return null;
             }
 
@@ -388,26 +388,26 @@ namespace Photon.Voice.Unity
             {
                 if (speakers.Length > 1)
                 {
-                    this.Logger.LogWarning("Multiple Speaker components found attached to the GameObject (VoiceConnection.SpeakerPrefab) or its children. Using the first one we found.");
+                    this.Logger.Log(LogLevel.Warning, "Multiple Speaker components found attached to the GameObject (VoiceConnection.SpeakerPrefab) or its children. Using the first one we found.");
                 }
                 if (destroyOnRemove)
                 {
                     speakers[0].OnRemoteVoiceRemoveAction += (s) =>
                     {
-                        this.Logger.LogInfo("OnRemoteVoiceRemoveAction: destroying VoiceConnection.SpeakerPrefab instance [{0}]", go.name);
+                        this.Logger.Log(LogLevel.Info, "OnRemoteVoiceRemoveAction: destroying VoiceConnection.SpeakerPrefab instance [{0}]", go.name);
                         Destroy(go);
                     };
                 }
                 if (parent != null)
                 {
-                    go.transform.SetParent(parent.transform);
+                    go.transform.SetParent(parent.transform, false);
                 }
-                this.Logger.LogInfo("Instance of VoiceConnection.SpeakerPrefab instantiated.");
+                this.Logger.Log(LogLevel.Info, "Instance of VoiceConnection.SpeakerPrefab instantiated.");
                 return speakers[0];
             }
             else
             {
-                this.Logger.LogError("SpeakerPrefab does not have a component of type Speaker in its hierarchy.");
+                this.Logger.Log(LogLevel.Error, "SpeakerPrefab does not have a component of type Speaker in its hierarchy.");
                 Destroy(go);
                 return null;
             }
@@ -417,7 +417,7 @@ namespace Photon.Voice.Unity
         {
             if (voiceInfo.Codec != Codec.AudioOpus)
             {
-                this.Logger.LogInfo("OnRemoteVoiceInfo: Skipped as codec is not Opus, [p#{0} v#{1} c#{2} i:{{{3}}}]", playerId, voiceId, channelId, voiceInfo);
+                this.Logger.Log(LogLevel.Info, "OnRemoteVoiceInfo: Skipped as codec is not Opus, [p#{0} v#{1} c#{2} i:{{{3}}}]", playerId, voiceId, channelId, voiceInfo);
                 return;
             }
 
@@ -425,12 +425,12 @@ namespace Photon.Voice.Unity
             if (Application.platform == RuntimePlatform.WebGLPlayer)
             {
 #if !UNITY_2021_2_OR_NEWER // opus lib requires Emscripten 2.0.19
-                this.Logger.LogError("Remote voice Opus decoder requies Unity 2021.2 or newer for WebGL");
+                this.Logger.Log(LogLevel.Error, "Remote voice Opus decoder requies Unity 2021.2 or newer for WebGL");
                 options.Decoder = null; // null Opus decoder set by RemoteVoiceLink
 #endif
             }
 
-            this.Logger.LogInfo("OnRemoteVoiceInfo:  {0}", remoteVoice);
+            this.Logger.Log(LogLevel.Info, "OnRemoteVoiceInfo:  {0}", remoteVoice);
             this.cachedRemoteVoices.Add(remoteVoice);
             if (RemoteVoiceAdded != null)
             {
@@ -438,13 +438,13 @@ namespace Photon.Voice.Unity
             }
             remoteVoice.RemoteVoiceRemoved += () =>
             {
-                this.Logger.LogInfo("OnRemoteVoiceInfo: RemoteVoiceRemoved {0}", remoteVoice);
+                this.Logger.Log(LogLevel.Info, "OnRemoteVoiceInfo: RemoteVoiceRemoved {0}", remoteVoice);
                 this.cachedRemoteVoices.Remove(remoteVoice);
             };
             var speaker = this.InstantiateSpeakerForRemoteVoice(playerId, voiceId, voiceInfo.UserData);
             if (speaker == null)
             {
-                this.Logger.LogDebug("OnRemoteVoiceInfo: Remote GameObject not found or does not have a Speaker {0}", remoteVoice);
+                this.Logger.Log(LogLevel.Debug, "OnRemoteVoiceInfo: Remote GameObject not found or does not have a Speaker {0}", remoteVoice);
             }
             else
             {
@@ -455,7 +455,7 @@ namespace Photon.Voice.Unity
 
         protected virtual void OnVoiceStateChanged(ClientState fromState, ClientState toState)
         {
-            this.Logger.LogInfo("OnVoiceStateChanged from {0} to {1}", fromState, toState);
+            this.Logger.Log(LogLevel.Info, "OnVoiceStateChanged from {0} to {1}", fromState, toState);
             if (fromState == ClientState.Joined)
             {
                 for (int i = 0; i < this.recorders.Count; i++)
@@ -532,7 +532,7 @@ namespace Photon.Voice.Unity
 #endif
             if (speaker.Link(remoteVoice))
             {
-                this.Logger.LogInfo("Speaker linked with remote voice {0}", remoteVoice);
+                this.Logger.Log(LogLevel.Info, "Speaker linked with remote voice {0}", remoteVoice);
                 this.linkedSpeakers.Add(speaker);
                 remoteVoice.RemoteVoiceRemoved += () =>
                 {
@@ -556,12 +556,12 @@ namespace Photon.Voice.Unity
                 }
                 else
                 {
-                    this.Logger.LogWarning("AddRecorder: failed to init recorder {0}.", rec);
+                    this.Logger.Log(LogLevel.Warning, "AddRecorder: failed to init recorder {0}.", rec);
                 }
             }
             else
             {
-                this.Logger.LogError("AddRecorder: recorder {0} already added.", rec);
+                this.Logger.Log(LogLevel.Error, "AddRecorder: recorder {0} already added.", rec);
             }
 
             return false;
@@ -580,7 +580,7 @@ namespace Photon.Voice.Unity
         {
             if (operationResponse.ReturnCode != ErrorCode.Ok && (operationResponse.OperationCode != OperationCode.JoinRandomGame || operationResponse.ReturnCode == ErrorCode.NoRandomMatchFound))
             {
-                this.Logger.LogError("Operation {0} response error code {1} message {2}", operationResponse.OperationCode, operationResponse.ReturnCode, operationResponse.DebugMessage);
+                this.Logger.Log(LogLevel.Error, "Operation {0} response error code {1} message {2}", operationResponse.OperationCode, operationResponse.ReturnCode, operationResponse.DebugMessage);
             }
         }
 

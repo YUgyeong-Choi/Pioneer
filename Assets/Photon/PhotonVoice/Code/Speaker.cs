@@ -147,30 +147,30 @@ namespace Photon.Voice.Unity
 
         private void AudioConfigurationChangeHandler(bool deviceWasChanged)
         {
-            this.Logger.LogInfo("Audio configuration changed. Restarting.");
+            this.Logger.Log(LogLevel.Info, "Audio configuration changed. Restarting.");
             RestartPlayback();
         }
 
         // called from Link() and when restarting
         private void Initialize()
         {
-            this.Logger.LogInfo("Initializing.");
+            this.Logger.Log(LogLevel.Info, "Initializing.");
             this.audioOutput = CreateAudioOut();
-            this.Logger.LogInfo("Initialized.");
+            this.Logger.Log(LogLevel.Info, "Initialized.");
         }
 
         protected virtual IAudioOut<float> CreateAudioOut()
         {
 #if !UNITY_EDITOR && (UNITY_PS4 || UNITY_PS5)
-            this.Logger.LogInfo("OutputPlugin is set to " + OutputPlugin);
+            this.Logger.Log(LogLevel.Info, "OutputPlugin is set to " + OutputPlugin);
             if(OutputPlugin == AudioOutputPlugin.PhotonVoiceAudioOutputPlugin)
             {
-                this.Logger.LogInfo("sending output to PlayStationAudioOut.");
+                this.Logger.Log(LogLevel.Info, "sending output to PlayStationAudioOut.");
                 return new Photon.Voice.PlayStation.PlayStationAudioOut(this.PlayStationUserID);
             }
             else
             {
-                this.Logger.LogInfo("sending output to Mixer.");
+                this.Logger.Log(LogLevel.Info, "sending output to Mixer.");
                 this.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("PSUserID", this.PlayStationUserID);
                 // fall through to the default return line at the end of this function
             }
@@ -194,7 +194,7 @@ namespace Photon.Voice.Unity
 
             return webOut;
     #else
-            this.Logger.LogError("Speaker requies Unity 2021.2 or newer for WebGL");
+            this.Logger.Log(LogLevel.Error, "Speaker requies Unity 2021.2 or newer for WebGL");
             return new AudioOutDummy<float>();
     #endif
 #endif
@@ -205,15 +205,15 @@ namespace Photon.Voice.Unity
         {
             if (this.IsLinked)
             {
-                this.Logger.LogWarning("Speaker already linked to {0}, cancelled linking to {1}", this.RemoteVoice, stream);
+                this.Logger.Log(LogLevel.Warning, "Speaker already linked to {0}, cancelled linking to {1}", this.RemoteVoice, stream);
                 return false;
             }
             if (stream.VoiceInfo.Channels <= 0) // early avoid possible crash due to ArgumentException in AudioClip.Create inside UnityAudioOut.Start
             {
-                this.Logger.LogError("Received voice info channels is not expected (<= 0), cancelled linking to {0}", stream);
+                this.Logger.Log(LogLevel.Error, "Received voice info channels is not expected (<= 0), cancelled linking to {0}", stream);
                 return false;
             }
-            this.Logger.LogInfo("Link {0}", stream);
+            this.Logger.Log(LogLevel.Info, "Link {0}", stream);
             stream.RemoteVoiceRemoved += OnRemoteVoiceRemove;
             stream.FloatFrameDecoded += this.OnAudioFrame;
             this.RemoteVoice = stream;
@@ -223,7 +223,7 @@ namespace Photon.Voice.Unity
 
         private void OnRemoteVoiceRemove()
         {
-            this.Logger.LogInfo("OnRemoteVoiceRemove {0}", this.RemoteVoice);
+            this.Logger.Log(LogLevel.Info, "OnRemoteVoiceRemove {0}", this.RemoteVoice);
             this.StopPlayback();
             if (this.OnRemoteVoiceRemoveAction != null) { this.OnRemoteVoiceRemoveAction(this); }
             this.Unlink();
@@ -245,23 +245,23 @@ namespace Photon.Voice.Unity
         {
             if (this.RemoteVoice == null)
             {
-                this.Logger.LogWarning("Cannot start playback because speaker is not linked");
+                this.Logger.Log(LogLevel.Warning, "Cannot start playback because speaker is not linked");
                 return false;
             }
             if (audioOutput == null)
             {
-                this.Logger.LogWarning("Cannot start playback because not initialized yet");
+                this.Logger.Log(LogLevel.Warning, "Cannot start playback because not initialized yet");
                 return false;
             }
             var vi = this.RemoteVoice.VoiceInfo;
             this.audioOutput.Start(vi.SamplingRate, vi.Channels, vi.FrameDurationSamples);
-            this.Logger.LogInfo("Speaker started playback: {0}, delay {1}", vi, this.playDelayConfig);
+            this.Logger.Log(LogLevel.Info, "Speaker started playback: {0}, delay {1}", vi, this.playDelayConfig);
             return true;
         }
 
         protected virtual void OnDestroy()
         {
-            this.Logger.LogInfo("OnDestroy");
+            this.Logger.Log(LogLevel.Info, "OnDestroy");
             this.StopPlayback();
             this.Unlink();
             AudioSettings.OnAudioConfigurationChanged -= AudioConfigurationChangeHandler;
@@ -270,7 +270,7 @@ namespace Photon.Voice.Unity
         // stopping audioOutput releases its resources
         private void StopPlayback()
         {
-            this.Logger.LogInfo("StopPlayback");
+            this.Logger.Log(LogLevel.Info, "StopPlayback");
             if (this.audioOutput != null)
             {
                 this.audioOutput.Stop();
@@ -291,7 +291,7 @@ namespace Photon.Voice.Unity
         {
             if (System.Threading.Interlocked.Exchange(ref this.restartPlaybackPending, 0) != 0)
             {
-                this.Logger.LogInfo("Restarting playback");
+                this.Logger.Log(LogLevel.Info, "Restarting playback");
                 this.StopPlayback();  // stopping audioOutput releases its resources
                 this.Initialize();    // new audioOutput is created
                 this.StartPlayback(); // starting audioOutput

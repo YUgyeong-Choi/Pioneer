@@ -32,12 +32,12 @@ namespace Photon.Voice.Unity
             if (err != 0)
             {
                 Error = "Can't create MediaRecorder: " + err;
-                logger.LogError("[PV] WebAudioMicIn: " + Error);
+                logger.Log(LogLevel.Error, "[PV] WebAudioMicIn: " + Error);
             }
             else
             {
                 sourceSamplingRate = samplingRate;
-                logger.LogInfo("[PV] WebAudioMicIn: microphone initialized, handle = {0}, frequency = {1}, channels = {2}", handle, samplingRate, channels);
+                logger.Log(LogLevel.Info, "[PV] WebAudioMicIn: microphone initialized, handle = {0}, frequency = {1}, channels = {2}", handle, samplingRate, channels);
             }
         }
 

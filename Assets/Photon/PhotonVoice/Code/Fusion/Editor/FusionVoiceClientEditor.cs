@@ -46,12 +46,12 @@ namespace Photon.Voice.Fusion.Editor
             }
             EditorGUILayout.PropertyField(this.useFusionAuthValuesSp, new GUIContent("Use Fusion Auth Values", "Use the same Authentication Values From PUN client"));
         }
-        
+
         protected override void ShowHeader()
         {
             base.ShowHeader();
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(this.autoConnectAndJoinSp, new GUIContent("Auto Connect And Join", "Auto connect voice client and join a voice room when PUN client is joined to a PUN room"));
+            EditorGUILayout.PropertyField(this.autoConnectAndJoinSp, new GUIContent("Auto Connect And Join", "Auto connect voice client and join a voice room when Fusion client is joined to a Fusion room"));
             if (EditorGUI.EndChangeCheck())
             {
                 this.serializedObject.ApplyModifiedProperties();

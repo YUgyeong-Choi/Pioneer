@@ -39,7 +39,7 @@ namespace Photon.Voice.Unity
                 // [id1, lbl1, id2, lbl2,...]
                 devices = ptrMan.Select((x, i) => new { Str = x, Ind = i }).GroupBy(x => x.Ind / 2, x => x.Str).Select(x => new DeviceInfo(Marshal.PtrToStringUTF8(x.First()), Marshal.PtrToStringUTF8(x.ElementAt(1)))).ToList();
 
-                logger.LogInfo("[PV] WebDeviceEnumerator " +  filter + ": refreshed");
+                logger.Log(LogLevel.Info, "[PV] WebDeviceEnumerator " +  filter + ": refreshed");
             }
 
             if (OnReady != null)
@@ -51,7 +51,7 @@ namespace Photon.Voice.Unity
         public WebDeviceEnumerator(ILogger logger, string filter) : base(logger)
         {
             this.filter = filter;
-            logger.LogInfo("[PV] WebDeviceEnumerator " + filter + ": created");
+            logger.Log(LogLevel.Info, "[PV] WebDeviceEnumerator " + filter + ": created");
             Refresh();
         }
 

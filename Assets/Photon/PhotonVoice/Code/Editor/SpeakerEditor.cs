@@ -50,6 +50,9 @@
 
             speaker.PlayDelay = EditorGUILayout.IntField(new GUIContent("Play Delay", "Remote audio stream play delay to compensate packets latency variations."), speaker.PlayDelay);
             speaker.RestartOnDeviceChange = EditorGUILayout.Toggle(new GUIContent("Restart On Device Change", "Restart the Speaker whenever the global audio settings are changed."), speaker.RestartOnDeviceChange);
+#if UNITY_PS4 || UNITY_PS5
+            speaker.OutputPlugin = (Speaker.AudioOutputPlugin)EditorGUILayout.EnumPopup(new GUIContent("PlayStation Audio Output Plugin", "Choose between routing audio directly to the Sony audio output APIs or through the Unity audio mixer."), speaker.OutputPlugin);
+#endif
 
             if (EditorGUI.EndChangeCheck())
             {

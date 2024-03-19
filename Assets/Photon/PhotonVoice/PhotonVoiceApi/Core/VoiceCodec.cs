@@ -9,6 +9,7 @@
 // ----------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Runtime.InteropServices;
 
 namespace Photon.Voice
@@ -308,11 +309,43 @@ namespace Photon.Voice
             Info = new ImageBufferInfo(width, height, new ImageBufferInfo.StrideSet(1, stride), imageFormat);
             Planes = new PlaneSet(1, buf);
         }
+
         public ImageBufferInfo Info;
         public PlaneSet Planes; // operator[] setter does not compile if this member is a property (because [] applies to a copy of the property)
 
+        private int refCnt = 1;
+
+        // reset for reuse
+        protected virtual void Reset()
+        {
+            refCnt = 1;
+            Info.Rotation = Rotation.Rotate0;
+            Info.Flip = Flip.None;
+        }
+
+        protected virtual void Free()
+        {
+        }
+
+        public void Retain()
+        {
+            Interlocked.Increment(ref refCnt);
+        }
+
+        public void Retain(int times)
+        {
+            Interlocked.Add(ref refCnt, times);
+        }
+
         // Release resources for dispose or reuse.
-        public virtual void Release() { }
+        public void Release()
+        {
+            if(Interlocked.Decrement(ref refCnt) == 0)
+            {
+                Free();
+            }
+        }
+
         public virtual void Dispose() { }
 
     }
@@ -332,11 +365,16 @@ namespace Photon.Voice
             }
         }
 
-        public override void Release()
+        protected override void Free()
         {
             if (pool != null)
             {
+                Reset();
                 pool.Release(this);
+            }
+            else
+            {
+                Dispose();
             }
         }
 
@@ -372,11 +410,16 @@ namespace Photon.Voice
 
         public byte[][] PlaneBytes => planeBytes;
 
-        public override void Release()
+        protected override void Free()
         {
             if (pool != null)
             {
+                Reset();
                 pool.Release(this);
+            }
+            else
+            {
+                Dispose();
             }
         }
 
@@ -413,12 +456,16 @@ namespace Photon.Voice
             Planes[0] = planeHandle.AddrOfPinnedObject();
         }
 
-        public override void Release()
+        protected override void Free()
         {
-            planeHandle.Free();
             if (pool != null)
             {
+                Reset();
                 pool.Release(this);
+            }
+            else
+            {
+                Dispose();
             }
         }
 

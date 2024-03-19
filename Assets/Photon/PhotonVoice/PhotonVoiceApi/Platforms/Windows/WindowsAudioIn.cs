@@ -47,7 +47,7 @@ namespace Photon.Voice.Windows
                 {
                     Error = "Exception in WindowsAudioInPusher constructor";
                 }
-                logger.LogError("[PV] WindowsAudioInPusher: " + Error);
+                logger.Log(LogLevel.Error, "[PV] WindowsAudioInPusher: " + Error);
             }
         }
 
