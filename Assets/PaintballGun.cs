@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Autohand;
+// using Autohand;
 using UnityEngine;
 
 public class PaintballGun : MonoBehaviour
@@ -10,35 +10,35 @@ public class PaintballGun : MonoBehaviour
     [SerializeField] private float speed = 10.0f;
     [SerializeField] public GameObject paint;
 
-    private Grabbable grabbable;
+    // private Grabbable grabbable;
 
     private void Awake()
     {
-        grabbable = GetComponent<Grabbable>();
-
-        grabbable.onSqueeze.AddListener(Shoot);
+        // grabbable = GetComponent<Grabbable>();
+        //
+        // grabbable.onSqueeze.AddListener(Shoot);
     }
 
-    public void Shoot(Hand hand, Grabbable grabbable)
-    {
-        if (paint != null)
-        {
-            var rotation = transform.rotation;
-                
-                Quaternion.Euler(new Vector3(0,0,1));
-
-            // Loop through all prefabs and spawn them
-            var clone = Instantiate(paint, SpawnPoint.position, rotation);
-
-            clone.SetActive(true);
-
-            // Throw with velocity?
-            var cloneRigidbody = clone.GetComponent<Rigidbody>();
-
-            if (cloneRigidbody != null)
-            {
-                cloneRigidbody.velocity = clone.transform.forward * speed;
-            }
-        }
-    }
+    // public void Shoot(Hand hand, Grabbable grabbable)
+    // {
+    //     if (paint != null)
+    //     {
+    //         var rotation = transform.rotation;
+    //             
+    //             Quaternion.Euler(new Vector3(0,0,1));
+    //
+    //         // Loop through all prefabs and spawn them
+    //         var clone = Instantiate(paint, SpawnPoint.position, rotation);
+    //
+    //         clone.SetActive(true);
+    //
+    //         // Throw with velocity?
+    //         var cloneRigidbody = clone.GetComponent<Rigidbody>();
+    //
+    //         if (cloneRigidbody != null)
+    //         {
+    //             cloneRigidbody.velocity = clone.transform.forward * speed;
+    //         }
+    //     }
+    // }
 }

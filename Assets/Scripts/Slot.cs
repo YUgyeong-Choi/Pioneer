@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Autohand;
+// using Autohand;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,10 +26,10 @@ public class Slot : MonoBehaviour
 
         if (item == null) return;
         
-        if (!item.GetComponent<Grabbable>().IsHeld())
-        {
-            InsertItem(item.gameObject);
-        }
+        // if (!item.GetComponent<Grabbable>().IsHeld())
+        // {
+        //     InsertItem(item.gameObject);
+        // }
     }
 
     void InsertItem(GameObject go)
