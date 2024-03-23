@@ -80,14 +80,13 @@
       "url": "https://packages.unity.com"
     },
     "com.meta.xr.sdk.interaction": {
-      "version": "60.0.0",
-      "depth": 1,
-      "source": "registry",
+      "version": "file:com.meta.xr.sdk.interaction@60.0.0",
+      "depth": 0,
+      "source": "embedded",
       "dependencies": {
         "com.unity.textmeshpro": "3.0.6",
         "com.unity.ugui": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.meta.xr.sdk.interaction.ovr": {
       "version": "60.0.0",
@@ -100,14 +99,13 @@
       "url": "https://packages.unity.com"
     },
     "com.meta.xr.sdk.platform": {
-      "version": "60.0.0",
-      "depth": 1,
-      "source": "registry",
+      "version": "file:com.meta.xr.sdk.platform@60.0.0",
+      "depth": 0,
+      "source": "embedded",
       "dependencies": {
         "com.meta.xr.sdk.core": "60.0.0",
         "com.unity.ugui": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.meta.xr.sdk.voice": {
       "version": "60.0.0",
@@ -192,7 +190,7 @@
     },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -221,8 +219,8 @@
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.27",
-      "depth": 1,
+      "version": "3.0.28",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.ext.nunit": "1.0.6"

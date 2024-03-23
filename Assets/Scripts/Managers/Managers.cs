@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +20,8 @@ public class Managers : MonoBehaviour
     private SoundManager _sound = new SoundManager();
     private UIManager _ui = new UIManager();
 
+    private FusionManager _fusion = new FusionManager();
+
     public static DataManager Data => Instance._data;
     public static InputManager Input => Instance._input;
     public static PoolManager Pool => Instance._pool;
@@ -26,6 +29,7 @@ public class Managers : MonoBehaviour
     public static SceneManagerEx Scene => Instance._scene;
     public static SoundManager Sound => Instance._sound;
     public static UIManager UI => s_instance._ui;
+    public static FusionManager Fusion => s_instance._fusion;
     
     void Start()
     {
@@ -60,6 +64,8 @@ public class Managers : MonoBehaviour
         s_instance._data.Init();
         s_instance._pool.Init();
         s_instance._sound.Init();
+
+        s_instance._fusion.Init();
     }
 
     /// <summary>

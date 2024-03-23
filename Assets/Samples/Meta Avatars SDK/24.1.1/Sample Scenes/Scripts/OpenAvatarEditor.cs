@@ -23,7 +23,7 @@ public class OpenAvatarEditor : MonoBehaviour
                 return;
             }
 
-            AvatarEditorOptions options = new AvatarEditorOptions();
+            AvatarEditorOptions options = new AvatarEditorOptions() {};
             options.SetSourceOverride("avatar_2_sdk");
             var result = new Request<Oculus.Platform.Models.AvatarEditorResult>(Oculus.Platform.CAPI.ovr_Avatar_LaunchAvatarEditor((IntPtr)options));
         }

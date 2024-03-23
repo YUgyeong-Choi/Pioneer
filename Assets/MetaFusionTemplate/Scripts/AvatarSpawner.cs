@@ -22,8 +22,8 @@ namespace Chiligames.MetaFusionTemplate
 
         [HideInInspector] public NetworkRunner _runner;
         [SerializeField] NetworkRunnerHandler runnerHandler;
-        [SerializeField] Transform cameraRig;
-        [SerializeField] Transform centerEyeAnchor;
+        [SerializeField] public Transform cameraRig;
+        [SerializeField] public Transform centerEyeAnchor;
         [SerializeField] bool rememberAvatarPresetSelection;
 
         public event Action<FusionMetaAvatar> OnLocalAvatarLoaded;
@@ -134,7 +134,7 @@ namespace Chiligames.MetaFusionTemplate
             StartCoroutine(WaitForEntitlementCheckAndSpawn());
         }
 
-        //Wait for all the entitlements and the runner to be ready to spawn
+        // Wait for all the entitlements and the runner to be ready to spawn
         IEnumerator WaitForEntitlementCheckAndSpawn()
         {
             if(this == null)
@@ -153,8 +153,10 @@ namespace Chiligames.MetaFusionTemplate
                 avatar = _runner.Spawn(avatarPrefab, cameraRig.position, cameraRig.rotation, _runner.LocalPlayer);
                 var obj = _runner.Spawn(speakerPrefab, centerEyeAnchor.position, centerEyeAnchor.rotation, _runner.LocalPlayer);
                 obj.transform.SetParent(centerEyeAnchor.transform);
+                
                 var lipSync = FindObjectOfType<OvrAvatarLipSyncContext>();
                 lipSync.CaptureAudio = true;
+                
                 var fusionAvatar = avatar.GetComponent<FusionMetaAvatar>();
                 fusionAvatar.SetLipSync(lipSync);
                 fusionAvatar.SetAvatarSpawner(this);
