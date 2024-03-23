@@ -2049,8 +2049,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Buttons
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2414,8 +2414,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Interactables with networked transformers.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2548,8 +2548,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Select either your personal avatar or one of the predefined ones.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2873,8 +2873,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Poses
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3007,8 +3007,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Networked 2D and 3D buttons examples.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3388,6 +3388,18 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 4883119560770360990
       objectReference: {fileID: 0}
+    - target: {fileID: 7320247627713856253, guid: c05aab34ba8dc5441a207005dabf4272, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+    - target: {fileID: 7320247627713856253, guid: c05aab34ba8dc5441a207005dabf4272, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+    - target: {fileID: 7320247627713856253, guid: c05aab34ba8dc5441a207005dabf4272, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 911040644080872543, guid: c05aab34ba8dc5441a207005dabf4272, type: 3}
@@ -3510,8 +3522,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Avatar networked hand poses, handtracking only (for now).
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3830,8 +3842,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Avatar selection
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4522,8 +4534,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Networked Transformers
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5004,8 +5016,8 @@ MonoBehaviour:
   m_text: Basic networked interactables. Blue has physics (disabled for now), red
     is Kinematic.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5138,8 +5150,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Going to other scene
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5791,8 +5803,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Interactables
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6036,8 +6048,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Example on how to go to a different scene/room. Touch the purple sphere!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10623,8 +10635,8 @@ MonoBehaviour:
   m_text: 'Networked interactables that have physics and can be scaled using both
     hands. '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10739,8 +10751,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Scalables
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
+  m_sharedMaterial: {fileID: -4769098423120964693, guid: 1eceda6bffa3a0a42814a776165c9b30, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
