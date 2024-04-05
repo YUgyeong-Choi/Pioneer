@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Data;
 
@@ -22,6 +23,12 @@ public interface ILoader<TKey, TValue>
 /// </summary>
 public class DataManager
 {
+    public List<RoomData> roomDataList;
+    public List<RoomUiPositionDataClass> roomUiDataList = new List<RoomUiPositionDataClass>();
+    public int roomIndex;
+    private string _path;
+    
+    
     /// <summary>
     /// 게임 내 정보를 담는 Dictionary. 
     /// 처음 게임이 시작될 때, Init() 함수를 통해 필요한 정보를 여기에 캐싱하고,
@@ -36,6 +43,9 @@ public class DataManager
     /// </summary>
     public void Init()
     {
+        _path = Path.Combine(Application.persistentDataPath, "RoomData.json");
+        roomDataList = ReadRoomDataFromFile();
+        SetRoomUIPositionRotation();
         // 다음과 같은 형태로 사용 가능
         StatDict = LoadJson<Data.StatData, int, Data.Stat>("StatData").MakeDict();
     }
@@ -52,5 +62,41 @@ public class DataManager
     {
         TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Data/{path}");
         return JsonUtility.FromJson<TLoader>(textAsset.text);
+    }
+    
+    List<RoomData> ReadRoomDataFromFile()
+    {
+        List<RoomData> roomDataList = new List<RoomData>();
+
+        if (File.Exists(_path))
+        {
+            string[] lines = File.ReadAllLines(_path);
+
+            foreach (string line in lines)
+            {
+                RoomData roomData = JsonUtility.FromJson<RoomData>(line);
+                roomDataList.Add(roomData);
+            }
+        }
+        else
+        {
+            Debug.LogError("File not found: " + _path);
+        }
+
+        return roomDataList;
+    }
+
+    private void SetRoomUIPositionRotation()
+    {
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(3.829f, 1.4f, 1.75f), new Vector3(0f, 270f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(3.829f, 1.4f, -1.75f), new Vector3(0f, 270f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(3.829f, 1.4f, -1.768f), new Vector3(0f, 270f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(2.266f, 1.4f, -3f), new Vector3(0f, 0f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(0f, 1.4f, -3f), new Vector3(0f, 0f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(-2.266f, 1.4f, -3f), new Vector3(0f, 0f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(-3.89f, 1.4f, -1.745f), new Vector3(0f, 90f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(-3.89f, 1.4f, 0f), new Vector3(0f, 180f, 0f)));
+        roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(-3.89f, 1.4f, 1.745f), new Vector3(0f, 180f, 0f)));
+        
     }
 }
