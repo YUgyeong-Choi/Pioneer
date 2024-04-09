@@ -6,43 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MetaFusionTemplate/Scenes/Hub.unity
-    guid: c2a6d6239126ef545ba41addbeccd081
+    path: Assets/NewPioneer/Scenes/GalleryScene.unity
+    guid: 0523acb11caec6c4ab0265c4d2a56395
   - enabled: 1
-    path: Assets/MetaFusionTemplate/Scenes/Outdoors.unity
-    guid: 2647aa26a1cef6a47aa7a90404dc4325
-  - enabled: 0
-    path: Assets/Scenes/StartScene.unity
-    guid: cc07a67123dce9f4db134dafce2ac94d
-  - enabled: 0
-    path: Assets/Scenes/LoadingScene.unity
-    guid: bca7f259c2dcd984886bfe635ded8708
-  - enabled: 0
-    path: Assets/Scenes/RoomsScene.unity
-    guid: e2266860a13ae744db7d8626397979eb
+    path: Assets/NewPioneer/Scenes/HubScene.unity
+    guid: 84f40bc74086dcb4bb5264d4edc9c8d7
   - enabled: 1
-    path: Assets/Samples/Meta Avatars SDK/24.1.1/Sample Scenes/Environments/CornellBox/CornellBox.unity
-    guid: c0ee1c22e9b3d554e954aa342cd1a00f
-  - enabled: 1
-    path: Assets/Samples/Meta Avatars SDK/24.1.1/Sample Scenes/Environments/FBConnect/FBConnect.unity
-    guid: f2240ea394ca78f4a9e886c82b925e0b
-  - enabled: 1
-    path: Assets/Samples/Meta Avatars SDK/24.1.1/Sample Scenes/Environments/FootprintCourt/FootprintCourt.unity
-    guid: f2431c06c4a030e4380a0ca0083ad44b
-  - enabled: 1
-    path: Assets/Samples/Meta Avatars SDK/24.1.1/Sample Scenes/Environments/NeutralRig/NeutralRig.unity
-    guid: a7d07f891ef9cee4786dbd51d59c61f2
-  - enabled: 1
-    path: Assets/Samples/Meta Avatars SDK/24.1.1/Sample Scenes/Environments/VenuesLobby/VenuesLobby.unity
-    guid: e156f07382ee32d41b1a40c08924db3f
-  - enabled: 1
-    path: Assets/NewPioneer/HubScene.unity
-    guid: 3b10a506d1214274bba19ca72f77ea2f
-  - enabled: 1
-    path: Assets/NewPioneer/LobbyScene.unity
+    path: Assets/NewPioneer/Scenes/LobbyScene.unity
     guid: 56d36e5c1c2d2ed4a886fe7f2b8ebb18
   - enabled: 1
-    path: Assets/NewPioneer/RoomScene.unity
+    path: Assets/NewPioneer/Scenes/RoomScene.unity
     guid: dd99af6590590b340a6570a29690af69
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260, type: 2}
