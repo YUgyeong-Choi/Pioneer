@@ -257,7 +257,7 @@
     },
     "com.unity.inputsystem": {
       "version": "1.7.0",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
@@ -409,7 +409,7 @@
     },
     "com.unity.ugui": {
       "version": "1.0.0",
-      "depth": 1,
+      "depth": 0,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
