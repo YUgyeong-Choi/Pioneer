@@ -15,6 +15,25 @@ public class MakeRoom : MonoBehaviour
     private int sizeIndex=1;
     private List<string> sizeText = new List<string>() { "small", "middle", "large" };
     public RoomData roomData = new RoomData();
+    
+    private List<string> randomNameList = new List<string>() { 
+        "Cozy Cabin", 
+        "Sunny Villa", 
+        "Mystic Manor", 
+        "Tranquil Retreat", 
+        "Serene Oasis", 
+        "Whispering Woods", 
+        "Harmony Haven", 
+        "Eternal Eden", 
+        "Dreamy Dwelling", 
+        "Peaceful Paradise"
+    };
+
+    public void randomRoomNameBtn()
+    {
+        int randomIndex = UnityEngine.Random.Range(0, randomNameList.Count);
+        roomName.text = randomNameList[randomIndex];
+    }
 
     public void ShowBtn()
     {
