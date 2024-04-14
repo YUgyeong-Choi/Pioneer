@@ -81,30 +81,7 @@ public class RoomDataManager : MonoBehaviour
             
         }
         
-        // RoomsScene에 정보 전달
-        GameObject transfer = GameObject.Find("Information Transfer");
-
-        if (transfer != null)
-        {
-            DontDestroyOnLoad dontDestroyScript = transfer.GetComponent<DontDestroyOnLoad>();
-
-            if (dontDestroyScript != null)
-            {
-                dontDestroyScript.roomName = roomData.roomName;
-                dontDestroyScript.currentTime = roomData.currentTime;
-                dontDestroyScript.roomIndex = _roomIndex;
-            }
-            else
-            {
-                Debug.LogError("DontDestroyOnLoad 스크립트를 찾을 수 없습니다.");
-            }
-        }
-        else
-        {
-            Debug.LogError("'Player' 태그가 지정된 GameObject를 찾을 수 없습니다.");
-        }
-        
-        SceneManager.LoadScene(1);
+        //SceneManager.LoadScene(1);
 
     }
 }

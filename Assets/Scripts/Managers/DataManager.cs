@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -25,6 +26,7 @@ public class DataManager
 {
     public List<RoomData> roomDataList;
     public List<RoomUiPositionDataClass> roomUiDataList = new List<RoomUiPositionDataClass>();
+    public List<Vector3> roomSelectUiPosition = new List<Vector3>();
     public int roomIndex;
     private string _path;
     
@@ -46,6 +48,7 @@ public class DataManager
         _path = Path.Combine(Application.persistentDataPath, "RoomData.json");
         roomDataList = ReadRoomDataFromFile();
         SetRoomUIPositionRotation();
+        SetRoomSelectUIPosition();
         // 다음과 같은 형태로 사용 가능
         StatDict = LoadJson<Data.StatData, int, Data.Stat>("StatData").MakeDict();
     }
@@ -85,6 +88,26 @@ public class DataManager
 
         return roomDataList;
     }
+    
+    public void PlusRoom(RoomData roomData)
+    {
+        //파일 다음 줄에 추가
+        if (File.Exists(_path))
+        {
+            using (StreamWriter writer = File.AppendText(_path))
+            {
+                string jsonData = JsonUtility.ToJson(roomData);
+                writer.WriteLine(jsonData);
+            }
+        }
+        else // 파일 생성 및 추가
+        {
+            string data = JsonUtility.ToJson(roomData);
+            File.WriteAllText(_path, data + "\n");
+        }
+
+        roomIndex = roomDataList.Count;
+    }
 
     private void SetRoomUIPositionRotation()
     {
@@ -98,5 +121,15 @@ public class DataManager
         roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(-3.89f, 1.4f, 0f), new Vector3(0f, 180f, 0f)));
         roomUiDataList.Add(new RoomUiPositionDataClass(new Vector3(-3.89f, 1.4f, 1.745f), new Vector3(0f, 180f, 0f)));
         
+    }
+
+    private void SetRoomSelectUIPosition()
+    {
+        roomSelectUiPosition.Add(new Vector3(20,-0.7f,0));
+        roomSelectUiPosition.Add(new Vector3(40,-0.7f,0));
+        roomSelectUiPosition.Add(new Vector3(60,-0.7f,0));
+        roomSelectUiPosition.Add(new Vector3(20,-0.7f,20));
+        roomSelectUiPosition.Add(new Vector3(40,-0.7f,20));
+        roomSelectUiPosition.Add(new Vector3(60,-0.7f,20));
     }
 }
