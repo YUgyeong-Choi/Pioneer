@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1235,7 +1235,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -1470,7 +1471,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 477b1ea4afae37d4ab309d04410d70cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomsCollection: {fileID: 950944907}
   smallCube: {fileID: 5302692451649006931, guid: 50dd2f6fead2540408de8c64de79792c, type: 3}
   middleCube: {fileID: 5627283448778299372, guid: 781bf8791365a4249a26e65a24f8cc6d, type: 3}
   largeCube: {fileID: 1651609591959293317, guid: 08e1d0f816dbfe541be1bac94343d594, type: 3}
