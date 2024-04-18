@@ -10,12 +10,12 @@ Material:
   m_Name: HVLP
   m_Shader: {fileID: 4800000, guid: d2862e538ed34704297d434d0ab8c398, type: 3}
   m_Parent: {fileID: 2100000, guid: 7b0e4c1e24d479344b14432744f7ff61, type: 2}
-  m_ModifiedSerializedProperties: 0
+  m_ModifiedSerializedProperties: 4
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _USE_UV2_ALT
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
