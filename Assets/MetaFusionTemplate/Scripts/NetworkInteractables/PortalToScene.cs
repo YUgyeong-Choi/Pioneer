@@ -14,9 +14,11 @@ namespace Chiligames.MetaFusionTemplate
         }
         
         [ContextMenu("GoToScene")]
-        public void GoToScene()
+        public void GoToScene(string _sceneName = null)
         {
-            StartCoroutine(networkRunnerHandler.LoadNewScene(sceneName));
+            StartCoroutine(_sceneName == null
+                ? networkRunnerHandler.LoadNewScene(sceneName)
+                : networkRunnerHandler.LoadNewScene(_sceneName));
         }
     }
 }
