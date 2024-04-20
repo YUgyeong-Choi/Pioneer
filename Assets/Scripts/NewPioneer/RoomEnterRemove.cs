@@ -18,6 +18,11 @@ public class RoomEnterRemove : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
+    public void MultiBtn()
+    {
+        
+    }
+
     public void DeleteRoomBtn()
     {
         //Managers.Data.DeleteRoomData();
