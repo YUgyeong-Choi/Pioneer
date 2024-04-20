@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Data;
 
@@ -28,6 +29,7 @@ public class DataManager
     public List<RoomUiPositionDataClass> roomUiDataList = new List<RoomUiPositionDataClass>();
     public List<Vector3> roomSelectUiPosition = new List<Vector3>();
     public int roomIndex;
+    public bool multiSetting = false;
     private string _path;
     
     
@@ -107,6 +109,16 @@ public class DataManager
         }
 
         roomIndex = roomDataList.Count;
+    }
+    
+    public void DeleteRoom()
+    {
+        roomDataList.RemoveAt(roomIndex);
+
+        string text = string.Join("", roomDataList.Select(roomData => JsonUtility.ToJson(roomData) + "\n").ToArray());
+        File.WriteAllText(_path, text);
+        
+        roomDataList = ReadRoomDataFromFile();
     }
 
     private void SetRoomUIPositionRotation()
