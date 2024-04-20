@@ -31,7 +31,9 @@ public class DataManager
     public int roomIndex;
     public bool multiSetting = false;
     private string _path;
+    private string _roomMeshPath;
     
+    public List<byte[]> roomMeshList = new List<byte[]>();
     
     /// <summary>
     /// 게임 내 정보를 담는 Dictionary. 
@@ -48,6 +50,7 @@ public class DataManager
     public void Init()
     {
         _path = Path.Combine(Application.persistentDataPath, "RoomData.json");
+        _roomMeshPath = Path.Combine(Application.persistentDataPath, "RoomMesh.json");
         roomDataList = ReadRoomDataFromFile();
         SetRoomUIPositionRotation();
         SetRoomSelectUIPosition();
@@ -91,6 +94,34 @@ public class DataManager
         return roomDataList;
     }
     
+    List<byte[]> ReadRoomMeshDataFromFile()
+    {
+        List<byte[]> roomMeshDataList = new List<byte[]>();
+
+        if (File.Exists(_roomMeshPath))
+        {
+            string[] lines = File.ReadAllLines(_roomMeshPath);
+
+            foreach (string line in lines)
+            {
+                string[] byteValues = line.Split('-');
+                byte[] imageData = new byte[byteValues.Length];
+                for (int i = 0; i < byteValues.Length; i++)
+                {
+                    imageData[i] = Convert.ToByte(byteValues[i], 16);
+                }
+
+                roomMeshDataList.Add(imageData);
+            }
+        }
+        else
+        {
+            Debug.Log("File not found: " + _roomMeshPath);
+        }
+
+        return roomMeshDataList;
+    }
+    
     public void PlusRoom(RoomData roomData)
     {
         //파일 다음 줄에 추가
@@ -119,6 +150,41 @@ public class DataManager
         File.WriteAllText(_path, text);
         
         roomDataList = ReadRoomDataFromFile();
+    }
+
+    public void saveRoomData(byte[] imageData)
+    {
+        if (File.Exists(_roomMeshPath))
+        {
+            // room 내용 변경
+            if (roomMeshList.Count > roomIndex)
+            {
+                string roomMeshs = null;
+                roomMeshList[roomIndex] = imageData;
+                foreach (byte[] roomMesh in roomMeshList)
+                {
+                    string byteString = BitConverter.ToString(roomMesh);
+                    roomMeshs += byteString + "\n";
+                }
+
+                File.WriteAllText(_roomMeshPath, roomMeshs);
+            }
+            else //새로운 room 추가
+            {
+
+                using (StreamWriter writer = File.AppendText(_roomMeshPath))
+                {
+                    string byteString = BitConverter.ToString(imageData);
+                    writer.WriteLine(byteString);
+                }
+            }
+
+        }
+        else
+        {
+            string byteString = BitConverter.ToString(imageData);
+            File.WriteAllText(_roomMeshPath, byteString + "\n");
+        }
     }
 
     private void SetRoomUIPositionRotation()

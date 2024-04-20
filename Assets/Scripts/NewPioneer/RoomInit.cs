@@ -15,15 +15,10 @@ public class RoomInit : MonoBehaviour
     public GameObject largeCylinder;
     
     private GameObject newRoom = null;
-    
-    private List<byte[]> roomMeshList = new List<byte[]>();
-
     private CwPaintableMeshTexture meshTexture = null;
 
     void Start()
     {
-        //roomMeshList = ReadRoomMeshDataFromFile();
-        
         // 초기 방 생성
         string roomType = Managers.Data.roomDataList[Managers.Data.roomIndex].roomType;
         string roomSize = Managers.Data.roomDataList[Managers.Data.roomIndex].roomSize;
@@ -55,11 +50,11 @@ public class RoomInit : MonoBehaviour
         }
         
         // 방 데이터 있으면 불러오기
-        Debug.Log("roomCount: " + roomMeshList.Count);
-        if (roomMeshList.Count > Managers.Data.roomIndex)
+        Debug.Log("roomCount: " + Managers.Data.roomMeshList.Count);
+        if (Managers.Data.roomMeshList.Count > Managers.Data.roomIndex)
         {
             CwPaintableMeshTexture mesh = newRoom.GetComponent<CwPaintableMeshTexture>();
-            mesh.LoadFromData(roomMeshList[Managers.Data.roomIndex]);
+            mesh.LoadFromData(Managers.Data.roomMeshList[Managers.Data.roomIndex]);
         }
         else
         {
@@ -68,73 +63,11 @@ public class RoomInit : MonoBehaviour
         }
     }
 
-    /**
-    List<byte[]> ReadRoomMeshDataFromFile()
-    {
-        List<byte[]> roomMeshDataList = new List<byte[]>();
-
-        if (File.Exists(_roomMeshPath))
-        {
-            string[] lines = File.ReadAllLines(_roomMeshPath);
-
-            foreach (string line in lines)
-            {
-                string[] byteValues = line.Split('-');
-                byte[] imageData = new byte[byteValues.Length];
-                for (int i = 0; i < byteValues.Length; i++)
-                {
-                    imageData[i] = Convert.ToByte(byteValues[i], 16);
-                }
-
-                roomMeshDataList.Add(imageData);
-            }
-        }
-        else
-        {
-            Debug.Log("File not found: " + _roomMeshPath);
-        }
-
-        return roomMeshDataList;
-    }
-
-
     public void ExitButton()
     {
         CwPaintableMeshTexture mesh = newRoom.GetComponent<CwPaintableMeshTexture>();
         byte[] imageData = mesh.GetPngData();
 
-        if (File.Exists(_roomMeshPath))
-        {
-            // room 내용 변경
-            if (roomMeshList.Count > roomIndex)
-            {
-                string roomMeshs = null;
-                roomMeshList[roomIndex] = imageData;
-                foreach (byte[] roomMesh in roomMeshList)
-                {
-                    string byteString = BitConverter.ToString(roomMesh);
-                    roomMeshs += byteString + "\n";
-                }
-
-                File.WriteAllText(_roomMeshPath, roomMeshs);
-            }
-            else //새로운 room 추가
-            {
-
-                using (StreamWriter writer = File.AppendText(_roomMeshPath))
-                {
-                    string byteString = BitConverter.ToString(imageData);
-                    writer.WriteLine(byteString);
-                }
-            }
-
-        }
-        else
-        {
-            string byteString = BitConverter.ToString(imageData);
-            File.WriteAllText(_roomMeshPath, byteString + "\n");
-        }
-        Application.Quit();
+        Managers.Data.saveRoomData(imageData);
     }
-    **/
 }
