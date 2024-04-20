@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
+using Oculus.Interaction.Input;
 using UnityEngine;
 
 public class TypingArea : MonoBehaviour
@@ -12,7 +14,8 @@ public class TypingArea : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        GameObject hand = other.GetComponentInParent<OVRGrabber>().gameObject;
+        Log.Debug("트리거");
+        GameObject hand = other.GetComponentInParent<SyntheticHand>().gameObject;
         if (hand == null) return;
         if (hand == leftHand)
         {
@@ -25,7 +28,7 @@ public class TypingArea : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        GameObject hand = other.GetComponentInParent<OVRGrabber>().gameObject;
+        GameObject hand = other.GetComponentInParent<SyntheticHand>().gameObject;
         if (hand == null) return;
         if (hand == leftHand)
         {
