@@ -159,7 +159,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.unity.vrtemplate
+    Android: com.samples.pioneer3
     Standalone: com.Unity-Technologies.VR-Template
   buildNumber:
     Standalone: 0
